@@ -2,8 +2,8 @@
 
 ## DESCRIPTION
 Before applying provided R scripts, Bulk RNA-seq and DNase-seq data were pre-processed using custom pipelines **Bulk_RNA_alignment** and **CUT_DNA**.
-To reproduce the same pre-processing steps, we provided here the exact command lines used for these respective custom pipelines, or the equivalent command line syntax while using directly tools.
-Mapping and annotation were realized using [Ensembl GRCm39 genome](https://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz) and Ensembl GTF release 108
+To reproduce the same pre-processing steps, we provided here the exact command lines used for these respective custom pipelines, or the equivalent command line syntax while using directly tools.  
+Mapping and annotation were realized using Ensembl [GRCm39](https://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz) and [GTF release 108](https://ftp.ensembl.org/pub/release-108/gtf/mus_musculus/Mus_musculus.GRCm39.108.gtf.gz)
 
 ## BULK RNA-SEQ
 ### Requirements
