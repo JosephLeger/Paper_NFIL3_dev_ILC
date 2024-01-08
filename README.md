@@ -1,7 +1,7 @@
 # NFIL3_dev_ILC
 ## Description
 This repository contains codes and resources used to perform post-processing DNase-seq and Bulk RNA-seq data analysis.  
-Before applying these scripts, raw data were processed using **Bulk_RNA** and **CUT_DNA** custom pipelines.  
+Information about pre-processing steps are precised in PRE-PROCESSING.md.
 
 
 ## Session Info
