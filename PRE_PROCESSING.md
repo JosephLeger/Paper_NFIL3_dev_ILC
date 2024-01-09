@@ -23,7 +23,10 @@ sh QC.sh Raw
 sh MultiQC.sh QC/Raw
 
 # Trimming to remove adapters
+# For new batch
 sh Trim.sh -S 4:15 -L 3 -T 3 -M 36 -I ./Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
+# For old batch
+sh Trim.sh -S 4:15 -L 5 -T 3 -M 36 -I ./Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw_old_xp
 
 # Quality Check after trimming
 sh QC.sh Trimmed/Trimmomatic
