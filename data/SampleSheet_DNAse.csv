@@ -1,10 +1,10 @@
-ID	Tissue	Factor	Condition	Treatment	Replicate	bamReads	Peaks	PeakCaller
-ALP1	BM	ALP	ALP	DNAse-seq	1	SRR10754234_Clum_Trimmed_sorted_filtered.bam	SRR10754234_peaks.narrowPeak	narrow
-ALP2	BM	ALP	ALP	DNAse-seq	2	SRR10754235_Clum_Trimmed_sorted_filtered.bam	SRR10754235_peaks.narrowPeak	narrow
-ALP3	BM	ALP	ALP	DNAse-seq	3	SRR10754236_Clum_Trimmed_sorted_filtered.bam	SRR10754236_peaks.narrowPeak	narrow
-EILP1	BM	EILP	EILP	DNAse-seq	1	SRR10754237_Clum_Trimmed_sorted_filtered.bam	SRR10754237_peaks.narrowPeak	narrow
-EILP2	BM	EILP	EILP	DNAse-seq	2	SRR10754238_Clum_Trimmed_sorted_filtered.bam	SRR10754238_peaks.narrowPeak	narrow
-EILP3	BM	EILP	EILP	DNAse-seq	3	SRR10754239_Clum_Trimmed_sorted_filtered.bam	SRR10754239_peaks.narrowPeak	narrow
-ILCP1	BM	ILCP	ILCP	DNAse-seq	1	SRR10754240_Clum_Trimmed_sorted_filtered.bam	SRR10754240_peaks.narrowPeak	narrow
-ILCP2	BM	ILCP	ILCP	DNAse-seq	2	SRR10754241_Clum_Trimmed_sorted_filtered.bam	SRR10754241_peaks.narrowPeak	narrow
-ILCP3	BM	ILCP	ILCP	DNAse-seq	3	SRR10754242_Clum_Trimmed_sorted_filtered.bam	SRR10754242_peaks.narrowPeak	narrow
+ID,Tissue,Factor,Condition,Treatment,Replicate,bamReads,Peaks,PeakCaller
+ALP1,BM,ALP,ALP,DNAse-seq,1,SRR10754234_Clum_Trimmed_sorted_filtered.bam,SRR10754234_peaks.narrowPeak,narrow
+ALP2,BM,ALP,ALP,DNAse-seq,2,SRR10754235_Clum_Trimmed_sorted_filtered.bam,SRR10754235_peaks.narrowPeak,narrow
+ALP3,BM,ALP,ALP,DNAse-seq,3,SRR10754236_Clum_Trimmed_sorted_filtered.bam,SRR10754236_peaks.narrowPeak,narrow
+EILP1,BM,EILP,EILP,DNAse-seq,1,SRR10754237_Clum_Trimmed_sorted_filtered.bam,SRR10754237_peaks.narrowPeak,narrow
+EILP2,BM,EILP,EILP,DNAse-seq,2,SRR10754238_Clum_Trimmed_sorted_filtered.bam,SRR10754238_peaks.narrowPeak,narrow
+EILP3,BM,EILP,EILP,DNAse-seq,3,SRR10754239_Clum_Trimmed_sorted_filtered.bam,SRR10754239_peaks.narrowPeak,narrow
+ILCP1,BM,ILCP,ILCP,DNAse-seq,1,SRR10754240_Clum_Trimmed_sorted_filtered.bam,SRR10754240_peaks.narrowPeak,narrow
+ILCP2,BM,ILCP,ILCP,DNAse-seq,2,SRR10754241_Clum_Trimmed_sorted_filtered.bam,SRR10754241_peaks.narrowPeak,narrow
+ILCP3,BM,ILCP,ILCP,DNAse-seq,3,SRR10754242_Clum_Trimmed_sorted_filtered.bam,SRR10754242_peaks.narrowPeak,narrow
