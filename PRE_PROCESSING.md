@@ -33,7 +33,7 @@ sh QC.sh Trimmed/Trimmomatic
 sh MultiQC.sh QC/Trimmed/Trimmomatic
 
 # RSEM alignment
-sh RSEM.sh PE Trimmed/Trimmomatic/Paired ./Ref/refdata-RSEM-mm39.108/mm39_108
+sh RSEM.sh PE Trimmed/Trimmomatic/Paired ./Ref/refdata-RSEM-mm39.108/mm39.108
 ```
 
 ### Using directly tools
