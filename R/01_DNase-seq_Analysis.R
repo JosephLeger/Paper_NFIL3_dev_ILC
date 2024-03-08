@@ -3,6 +3,7 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
+
 # Perform DiffBind using data pre-filtered with Clumpify
 # Peak Calling was performed using MACS2
 # DiffBind FRD cutoff is setted to 0.1 (default = 0.05)
