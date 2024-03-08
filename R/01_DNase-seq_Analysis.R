@@ -22,7 +22,7 @@ SAMPLE_SHEET <- 'C:/Users/E15639P/Data/Epigenetic/DNAse-seq/mm39/SampleSheet_DNA
 setwd(PATH)
 
 # Load required packages and functions
-source('C:/Users/E15639P/Doctorat/Bulk_RNA-seq/Custom_functions.R')
+source('C:/Users/E15639P/Doctorat/NFIL3_dev_ILC/Custom_functions.R')
 library(DiffBind)
 library(tidyverse)
 library(stats)
