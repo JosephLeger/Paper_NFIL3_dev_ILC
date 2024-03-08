@@ -26,7 +26,7 @@ DATA_DIR     <- 'C:/Users/E15639P/Data/Bulk/NFIL3_dev_ILC/genes.results'
 SAMPLE_SHEET <- 'C:/Users/E15639P/Data/Bulk/NFIL3_DEV_ILC/SampleSheet_Bulk_RNA.csv'
 setwd(PATH)
 
-source('C:/Users/E15639P/Doctorat/Bulk_RNA-seq/Custom_functions.R')
+source('C:/Users/E15639P/Doctorat/NFIL3_dev_ILC/Custom_functions.R')
 suppressPackageStartupMessages(library(Biobase))
 suppressPackageStartupMessages(library(edgeR))
 suppressPackageStartupMessages(library(EnhancedVolcano))
