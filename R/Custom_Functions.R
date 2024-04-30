@@ -31,6 +31,32 @@ ColorBlind <- c(Blues, Others, YReds, Greys)
 
 
 #===============================================================================
+# PLOTS ------------------------------------------------------------------------
+#===============================================================================
+
+writePlot <- function(plot, path, filename=F, width=9, height=9, res=100){
+  
+  # Save plot as PNG formated file named by the variable containing it
+  #
+  # plot     = variable containing plot to save
+  # path     = path of the directory to save the plot
+  # filename = could be used to define filename other than the variable name
+  # width    = width of saved plot (inches)
+  # height   = height of saved plot (inches)
+  # res      = resolution to save
+  
+    if(filename == F){
+    file <- paste0(path, '/', deparse(substitute(plot)), '.png')
+  }else{
+    file <- paste0(path, '/', filename, '.png')
+  }
+  show(plot)
+  dev.print(png, file, width=width, height=height, units='in', res=res)
+}
+
+
+
+#===============================================================================
 # BULK RNA-SEQ FUNCTIONS -------------------------------------------------------
 #===============================================================================
 
@@ -73,39 +99,33 @@ OrderMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, sl
   
   # V2 - Get the matrix corresponding to slot chosen
   if(slot == "data"){
-    table <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@data)))
+    tablex <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@data)))
   }else if(slot == "scaledata"){
-    table <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@scale.data)))
+    tablex <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@scale.data)))
   }else if(slot == "counts"){
-    table <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@counts)))
+    tablex <- as.data.frame(t(as.matrix(x@assays[[x@active.assay]]@counts)))
   }else{
     stop("slot must be in 'data', 'scaledata' or 'counts'")
   }
   
   
-  # Subset selected features if min.cells != 0
-  #features <- rownames(as.data.frame(x@assays[[x@active.assay]]@counts)[rowSums(x@assays[[x@active.assay]]@counts) >= min.cells,])
-  
-  # Generating filtered matrix with pseudotime
-  #table <- as.data.frame(t(as.matrix(slot)))
-  #table <- table[,colnames(table) %in% features]
   pseudotime <- x@meta.data[[trajectory]]
-  matrix_leap <- cbind(pseudotime, table)
-  colnames(matrix_leap) <- c('Pseudotime', colnames(table))
+  matrix_leap <- cbind(pseudotime, tablex)
+  colnames(matrix_leap) <- c('Pseudotime', colnames(tablex))
   
   # Keeping only cells belonging to chosen trajectory and sort them
   matrix_leap  <- subset(matrix_leap, subset = !is.na(matrix_leap$Pseudotime))
   matrix_leap  <- matrix_leap[order(matrix_leap$Pseudotime),]
-  matrix_leap <- as.data.frame(t(matrix_leap))
+  
   
   # V2 - Eliminate genes expressed in less than min.cells
-  cell_num <- rowSums(matrix_leap != 0)
-  features_to_keep <- names(cell_num[cell_num >= min.cells])
-  matrix_leap <- matrix_leap[features_to_keep,] 
+  cell_num <- colSums(matrix_leap != 0)
+  features_to_keep <- unique(c('Pseudotime', names(cell_num[cell_num >= min.cells])))
+  matrix_leap <- matrix_leap[,features_to_keep] 
   
   # V2 -  Warning if datascale slot is used
-  if(min.cells != 0 & slot == "scaledata"){
-    warning("min.cells not efficient for scaledata slot")
+  if(min.cells != 0 & slot == 'scaledata'){
+    warning('min.cells not efficient for scaledata slot')
   }
   
   return(matrix_leap)
@@ -121,7 +141,7 @@ CalculateBin <- function(x, bin.number){
   # bin.number = number of bin for representation
   
   
-  p <- as.vector(t(x["Pseudotime",]))
+  p <- as.vector(x$Pseudotime)
   # Establish the min and max value of pseudotime to generate the bin cutoff
   min.val    <- min(as.numeric(p))
   max.val    <- max(as.numeric(p))
@@ -153,21 +173,26 @@ PseudotimeRepartition <- function(x, bin.number = 21, bin.level = NULL){
     bin.level <- CalculateBin(x, bin.number)
   }
   
-  bin.level    <- bin.level[-1]
-  i.bin        <- 0
+  bin.centers <- c()
+  bin.range   <- max(x$Pseudotime)/bin.number
+  for(b in 1:(length(bin.level)-1)){
+    bin.centers <- c(bin.centers, bin.level[b]+(bin.range/2))
+  } 
+  
+  i.bin       <- 1
   attribution <- c()
   
   # Attribute a bin to each cell
-  for(i in 1:ncol(x)){
-    if(as.numeric(x["Pseudotime",i]) <= bin.level[i.bin+1]){
-      attribution <- c(attribution, i.bin)
+  for(i in 1:nrow(x)){
+    if(as.numeric(x$Pseudotime[i]) <= bin.level[i.bin+1]){
+      attribution <- c(attribution, bin.centers[i.bin])
     } else {
-      attribution <- c(attribution, i.bin+1)
+      attribution <- c(attribution, bin.centers[i.bin+1])
       i.bin <- i.bin+1
     }
   }
-  x <- rbind(attribution, x)
-  rownames(x) <- c("Bin", rownames(x)[2:nrow(x)])
+  x <- cbind(attribution, x)
+  colnames(x) <- c("Bin", colnames(x)[2:ncol(x)])
   
   return(x)
 }
@@ -196,7 +221,8 @@ LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, slo
   
   # Run OrderMatrix and eliminates pseudotime row to get LEAP matrix format
   leap_matrix <- OrderMatrix(x, trajectory, min.cells, assay, slot)
-  leap_matrix <- leap_matrix[rownames(leap_matrix) %!in% "Pseudotime",]
+  leap_matrix <- leap_matrix[,colnames(leap_matrix) %!in% "Pseudotime"]
+  leap_matrix <- as.data.frame(t(leap_matrix))
   
   # Generates correspong gene_index
   gene_index <- data.frame(id = c(1:nrow(leap_matrix)), gene = rownames(leap_matrix))
@@ -235,7 +261,7 @@ AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(),
   merged$`Column gene index` <- NULL
   merged$`Row gene index`    <- NULL
   if(write == TRUE){
-    write.table(merged, paste0(dir, '/', filename, '.txt'), row.names = FALSE)
+    write.table(merged, paste0(dir, '/', filename, '.txt'), row.names = FALSE, col.names =T, quote = F)
   }
   return(merged)
 }
@@ -243,8 +269,8 @@ AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(),
 #------------------------------------------------------------------------------#
 
 DrawExpr <- function(x, bin.number = 21, feature.list, 
-                     by.order = F, std = T, scale = F, scale.method = 0,
-                     superposed = F, compare.with = F, write = F, dir = getwd(), 
+                     by.order = F, std = F, scale = F, scale.method = 0,
+                     superposed = F, write = F, dir = getwd(), 
                      col = "black", lwd = 2, ylim = c(-0.75, 2), 
                      xlab = "Pseudotime", ylab = "", main = "Untitled", 
                      width = 900, height = 800){
@@ -273,25 +299,15 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
   
   # If x axis is setted to be cell ordered by rank and not by pseudotime value
   if(by.order){
-    x <- x[rownames(x) %!in% "Pseudotime",]
-    x <- rbind(c(1:ncol(x)), x)
-    rownames(x) <- c("Pseudotime", rownames(x)[2:nrow(x)])
+    x$Pseudotime <- 1:nrow(x)
   }
   
-  # If comparison have to be done, add reference gene to feature.list
-  if(compare.with != FALSE){
-    feature.list <- c(compare.with, feature.list)
-  }
-  
-  # Subset table for following steps
-  x <- x[rownames(x) %in% c("Pseudotime", feature.list),]
+  # Subset table for more efficiency during following steps
+  x <- x[colnames(x) %in% c('Pseudotime', feature.list),]
   
   
   # Attributes Bin to each cell
   x <- PseudotimeRepartition(x, bin.number)
-  
-  # Rotate dataframe to simplify call of x$Bin
-  x <- as.data.frame(t(x))
   
   # Initiate loop
   x.dim         <- as.numeric(names(table(x$Bin)))
@@ -309,7 +325,7 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
     if(feature %in% colnames(x)){
       for(b in x.dim){
         # Subset Bin
-        values      <- x[,feature][x$Bin == b]
+        values      <- x[,feature][as.character(x$Bin) == as.character(b)]
         # Scaling data if method 1 is precised
         if(scale & scale.method %in% 1){
           values <- (values-min(values))/(max(values)-min(values))
@@ -481,21 +497,17 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
   
   
   # Get sample names by default
-  sample.names <- names(table(
-    as.character(as.vector(x[rownames(x) %in% 'Sample',]))))
+  sample.names <- names(table(as.character(as.vector(x$Sample))))
   
   # If x axis is setted to be cell ordered by rank and not by pseudotime value
   if(by.order){
-    x <- x[rownames(x) %!in% 'Pseudotime',]
-    x <- rbind(c(1:ncol(x)), x)
-    rownames(x) <- c('Pseudotime', rownames(x)[2:nrow(x)])
+    x <- x[,colnames(x) %!in% 'Pseudotime']
+    x <- cbind(c(1:nrow(x)), x)
+    colnames(x) <- c('Pseudotime', colnames(x)[2:ncol(x)])
   }
   
   # Attribute Bin to each cell
   x <- PseudotimeRepartition(x, bin.number)
-  
-  # Rotate dataframe to simplify call of x$Bin
-  x <- as.data.frame(t(x))
   
   # Initiate loop
   x.dim         <- as.numeric(names(table(x$Bin)))
@@ -509,7 +521,8 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
       mean.expr     <- c()
       NA.list       <- c()
       for(b in x.dim){
-        values      <- as.numeric(subx[,feature][subx$Bin %in% b])
+        # Remove current point if number of values < 5
+        values      <- as.numeric(subx[,feature][as.character(subx$Bin) %in% as.character(b)])
         if(length(values) > 5){
           mean.expr <- c(mean.expr, mean(values))
         }else{
@@ -540,12 +553,13 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
     par(mar=c(5,4,2,7))
     for(s in rownames(res_table)){
       # Draw all expression plot
-      plot(as.numeric(res_table[s,]), type = "l", lwd = lwd, ylim = ylim, col = col[n],  
+      plot(x.dim, as.numeric(res_table[s,]), type = "l", lwd = lwd, ylim = ylim, 
+           xlim=c(min(x$Pseudotime), max(x$Pseudotime)), col = col[n],  
            xlab = xlab, ylab = ylab, main = main)
       par(new=TRUE)
       n <- n+1
     }
-    legend(x="topleft", inset=c(1,0), xpd=T, bty="n", legend = sample.names, col = col, lwd = 1, text.font = 0.5)
+    legend(x="topleft", inset=c(1,0), xpd=T, bty="n", legend = sample.names, col = col, lwd = lwd, text.font = 0.5)
     par(new=F)
   }else{
     warnings(paste(feature, 'gene not found.' ))
