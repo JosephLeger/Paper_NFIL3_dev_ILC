@@ -20,8 +20,8 @@ ColorBlind12 <- c('#016BA0', '#CA5100', '#5F9ED1', '#FF9933', '#A1C8EB',
                   '#3399FF', '#330066')
 
 # Custom 
-Blues <- c('#016BA0', '#5F9ED1', '#A1C8EB', '#3399FF',  '#006ddb', '#330066' )
-YReds <- c('#FF0000', '#FF9933', '#F0E442', '#ffff6d', "#FF7070")
+Blues <- c('#016BA0', '#5F9ED1', '#A1C8EB', '#3399FF',  '#006ddb', '#330066')
+YReds <- c('#FF0000', '#FF9933', '#F0E442', '#ffff6d', '#FF7070')
 Greys <- c('#131313','#555555', '#809099', '#CFCFCF', '#F2F4F4')
 Others <- c('#FFBBAB')
 
