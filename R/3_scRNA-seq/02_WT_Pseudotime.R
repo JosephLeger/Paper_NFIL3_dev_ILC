@@ -395,7 +395,7 @@ compare <- merge(monocle_pseudotime, sling_pseudotime, by = "Cell")
 
 # Linear correlation and p-value with Pearson's test
 stats <- LinearStats(compare$Monocle, compare$Slingshot)
-# R² = 0.9653 ans p-value < 2.2e-16
+# RÂ² = 0.9653 ans p-value < 2.2e-16
 
 cor.test(compare$Monocle_order,compare$Slingshot_order, method="spearman")
 #http://www.sthda.com/french/wiki/test-de-correlation-entre-deux-variables
@@ -418,7 +418,7 @@ plot8
 
 # Linear correlation and p-value with Pearson's test
 stats <- LinearStats(compare$Monocle_order, compare$Slingshot_order)
-# R² = 0.9606 and p-value < 2.2e-16
+# RÂ² = 0.9606 and p-value < 2.2e-16
 
 plot9 <- ggplot(compare, aes(y = Monocle_order, x = Slingshot_order)) +
   geom_point(aes(colour = factor(Sample, levels = c("ALP", "overLIP", "Tulip", "ILCpro"))), size = 1.5) +
