@@ -3,7 +3,6 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-
 # Perform DiffBind using data pre-filtered with Clumpify
 # Peak Calling was performed using MACS2
 # DiffBind FRD cutoff is setted to 0.1 (default = 0.05)
@@ -16,22 +15,24 @@
 
 rm(list=ls(all.names=TRUE))
 
-PATH         <- 'C:/Users/E15639P/Doctorat/NFIL3_dev_ILC'
-BAM_folder   <- 'C:/Users/E15639P/Data/Epigenetic/DNAse-seq/mm39/BAM'
-BED_folder   <- 'C:/Users/E15639P/Data/Epigenetic/DNAse-seq/mm39/Peaks/MACS2'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Data/Epigenetic/DNAse-seq/mm39/SampleSheet_DNAse.csv'
+PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
+BAM_folder   <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/BAM'
+BED_folder   <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/Peaks/MACS2'
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/SampleSheet_DNAse.csv'
 setwd(PATH)
 
 # Load required packages and functions
-source('C:/Users/E15639P/Doctorat/NFIL3_dev_ILC/Custom_functions.R')
-library(DiffBind)
-library(tidyverse)
-library(stats)
+source('C:/Users/E15639P/Doctorat/Bulk_RNA-seq/Custom_functions.R')
+suppressPackageStartupMessages(library(DiffBind))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(stats))
+
 
 # Create required directories
 dir.create(file.path(PATH, 'Figures'))
-dir.create(file.path(paste0(PATH, '/Figures'), 'DNAse-seq'))
 dir.create(file.path(PATH, 'Saves'))
+
+dir.create(file.path(paste0(PATH, '/Figures'), 'DNAse-seq'))
 dir.create(file.path(paste0(PATH, '/Saves'), 'DNAse-seq'))
 dir.create(file.path(paste0(PATH, '/Saves/DNAse-seq'), 'Peaks'))
 
