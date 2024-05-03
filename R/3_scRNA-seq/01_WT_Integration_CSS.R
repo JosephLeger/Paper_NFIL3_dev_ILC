@@ -139,7 +139,7 @@ data.combined <- FindVariableFeatures(data.combined, nfeatures = 3000)
 data.combined <- RunPCA(data.combined, npcs = 50)
 
 plot2         <- ElbowPlot(data.combined, 30) +
-  labs(title = "", y = "Écart type", x = "Numéro de la composante") + 
+  labs(title = "", y = "Ã‰cart type", x = "NumÃ©ro de la composante") + 
   theme(plot.title = element_text(hjust = 0.5))
 plot2
 
