@@ -86,7 +86,8 @@ Quantile_Normalization <- function(df){
 # LEAP -------------------------------------------------------------------------
 #===============================================================================
 
-OrderMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, slot = "data"){
+OrderMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, 
+                        slot = "data"){
   
   # Return an ordered matrix by pseudotime for chosen trajectory
   #
@@ -120,7 +121,8 @@ OrderMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, sl
   
   # V2 - Eliminate genes expressed in less than min.cells
   cell_num <- colSums(matrix_leap != 0)
-  features_to_keep <- unique(c('Pseudotime', names(cell_num[cell_num >= min.cells])))
+  features_to_keep <- unique(c('Pseudotime', names(cell_num[cell_num >= 
+                                                              min.cells])))
   matrix_leap <- matrix_leap[,features_to_keep] 
   
   # V2 -  Warning if datascale slot is used
@@ -199,8 +201,9 @@ PseudotimeRepartition <- function(x, bin.number = 21, bin.level = NULL){
 
 #------------------------------------------------------------------------------#
 
-LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, slot = "data",
-                       write = FALSE, dir = getwd(), suffix = NULL){
+LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, 
+                       slot = 'data', write = FALSE, dir = getwd(), 
+                       suffix = NULL){
   
   # Generates matrix_leap and gene_index for LEAP analysis
   #
@@ -216,7 +219,8 @@ LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, slo
   
   # If suffix is not defined, uses first and last character of trajectory
   if(is.null(suffix)){
-    suffix <- paste(substr(trajectory, 1, 1), substr(trajectory, nchar(trajectory),nchar(trajectory)), sep = "")
+    suffix <- paste0(substr(trajectory, 1, 1), 
+                     substr(trajectory, nchar(trajectory),nchar(trajectory)))
   }
   
   # Run OrderMatrix and eliminates pseudotime row to get LEAP matrix format
@@ -225,11 +229,14 @@ LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, slo
   leap_matrix <- as.data.frame(t(leap_matrix))
   
   # Generates correspong gene_index
-  gene_index <- data.frame(id = c(1:nrow(leap_matrix)), gene = rownames(leap_matrix))
+  gene_index <- data.frame(id = c(1:nrow(leap_matrix)), 
+                           gene = rownames(leap_matrix))
   
   if(write){
-    write.table(gene_index, paste(dir, "/gene_index_", suffix, ".txt", sep = ""), row.names = FALSE)
-    write.table(leap_matrix, paste(dir, "/matrix_leap_", suffix, ".txt", sep = ""), row.names = FALSE)
+    write.table(gene_index, paste0(dir, '/gene_index_', suffix, '.txt'), 
+                row.names = FALSE)
+    write.table(leap_matrix, paste0(dir, '/matrix_leap_', suffix, '.txt'), 
+                row.names = FALSE)
   }
   
   result <- list(leap_matrix, gene_index)
@@ -253,15 +260,19 @@ AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(),
   results    <- MAC
   gene_index <- index
   # Replacing gene id with gene names
-  colnames(results)          <- c('Correlation','Lag','Row gene index', 'Column gene index')
+  colnames(results)          <- c('Correlation','Lag','Row gene index', 
+                                  'Column gene index')
   colnames(gene_index)       <- c('Row gene index', 'gene_row')
-  merged                     <- merge(results, gene_index, by = 'Row gene index')
+  merged                     <- merge(results, gene_index, 
+                                      by = 'Row gene index')
   colnames(gene_index)       <- c('Column gene index', 'gene_col')
-  merged                     <- merge(merged, gene_index, by = 'Column gene index')
+  merged                     <- merge(merged, gene_index, 
+                                      by = 'Column gene index')
   merged$`Column gene index` <- NULL
   merged$`Row gene index`    <- NULL
   if(write == TRUE){
-    write.table(merged, paste0(dir, '/', filename, '.txt'), row.names = FALSE, col.names =T, quote = F)
+    write.table(merged, paste0(dir, '/', filename, '.txt'), row.names = FALSE, 
+                col.names =T, quote = F)
   }
   return(merged)
 }
@@ -280,18 +291,18 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
   # x            = ordered matrix 
   # bin.number   = number of bin for representation
   # feature_list = features to draw
-  # by.order     = if set to TRUE, consider cell order rather than pseudotimeto make bins
+  # by.order     = if TRUE, consider cell order and not pseudotime to make bins
   # std          = whether draw std in plot (only for superposed = FALSE)
   # scale        = whether scale shwon expression levels from 0 to 1
   # scale.method = 0 : absolute [0,1] / 1 : MinMax / 2 : amplitude
   # superposed   = whether draw all features superposed in a single plot
   # write        = whether save resulting plots
   # dir          = output directory to save plots
-  # col          = colors for plots (several can be specified for superposed plot)
+  # col          = colors for plots (several can be specified for superposed)
   # ylim         = ylim for plots (can be manually adjusted)
-  # xlab         = label on x axis for plots (default = "Pseudoime")
+  # xlab         = label on x axis for plots (default = "Pseudotime")
   # ylab         = label on y axis for plots (default = "")
-  # main         = specified title for superposed plot, if not superposed, plot title will be feature name
+  # main         = specified title for superposed plot
   # width        = width of png file if saving plot
   # height       = height of png file if saving plot
   
@@ -388,8 +399,8 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
     if(superposed == FALSE && compare.with == FALSE){
       for(feature in rownames(expr_table)){
         # Draw expression plot anyway
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = col[1],  
-             xlab = xlab, ylab = ylab, main = feature)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = col[1], xlab = xlab, ylab = ylab, main = feature)
         if(std == TRUE){
           # Calculate and draw STD surfaces
           par(new=TRUE)
@@ -398,8 +409,8 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
           polygon(x.surface, y.surface, col = "#e9e9e9", border = NA)
           par(new=TRUE)
           # Draw expression curve again (upper than std surfaces)
-          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = col[1],  
-               xlab = xlab, ylab = ylab, main = feature)
+          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+               col = col[1], xlab = xlab, ylab = ylab, main = feature)
           par(new=FALSE)
         }
       }
@@ -407,8 +418,8 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
       n <- 1
       for(feature in rownames(expr_table)){
         # Draw all expression plot
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = main)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = choose_color(col, n), xlab = xlab, ylab = ylab, main = main)
         par(new=TRUE)
         n <- n+1
       }
@@ -416,22 +427,25 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
     }else if(compare.with != FALSE){
       for(feature in rownames(expr_table)){
         n <- 1
-        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = "")
+        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, 
+             ylim = ylim, col = choose_color(col, n),  xlab = xlab, ylab = ylab, 
+             main = "")
         par(new=TRUE)
         n <- n+1
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = feature)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = choose_color(col, n), xlab = xlab, ylab = ylab,
+             main = feature)
         par(new=FALSE)
       }
     }
   }else if(write == TRUE){
     if(superposed == FALSE && compare.with == FALSE){
       for(feature in rownames(expr_table)){
-        png(paste(dir, "/", feature, ".png", sep = ""), width = width, height = height)
+        png(paste(dir, "/", feature, ".png", sep = ""), width = width, 
+            height = height)
         # Draw expression plot anyway
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = col[1],  
-             xlab = xlab, ylab = ylab, main = feature)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = col[1], xlab = xlab, ylab = ylab, main = feature)
         if(std == TRUE){
           # Calculate and draw STD surfaces
           par(new=TRUE)
@@ -440,8 +454,8 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
           polygon(x.surface, y.surface, col = "#e9e9e9", border = NA)
           par(new=TRUE)
           # Draw expression curve again (upper than std surfaces)
-          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = col[1],  
-               xlab = xlab, ylab = ylab, main = feature)
+          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+               col = col[1], xlab = xlab, ylab = ylab, main = feature)
           par(new=FALSE)
         }
         dev.off()
@@ -451,8 +465,8 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
       png(paste(dir, "/", main, ".png", sep = ""),width = 900, height = 800)
       for(feature in rownames(expr_table)){
         # Draw all expression plot
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = main)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = choose_color(col, n), xlab = xlab, ylab = ylab, main = main)
         par(new=TRUE)
         n <- n+1
       }
@@ -461,13 +475,16 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
     }else if(compare.with != FALSE){
       for(feature in rownames(expr_table)){
         n <- 1
-        png(paste(dir, "/", feature, ".png", sep = ""), width = width, height = height)
-        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = "")
+        png(paste(dir, "/", feature, ".png", sep = ""), width = width, 
+            height = height)
+        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, 
+             ylim = ylim, col = choose_color(col, n), xlab = xlab, ylab = ylab, 
+             main = "")
         par(new=TRUE)
         n <- n+1
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, col = choose_color(col, n),  
-             xlab = xlab, ylab = ylab, main = feature)
+        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
+             col = choose_color(col, n), xlab = xlab, ylab = ylab, 
+             main = feature)
         par(new=FALSE)
         dev.off()
       }
@@ -487,13 +504,13 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
   # x            = ordered matrix with celltypes described in "Sample" row
   # bin.number   = number of bin for representation
   # feature      = feature to draw
-  # by.order     = if set to TRUE, consider cell order rather than pseudotimeto make bins
+  # by.order     = if TRUE, consider cell order and not pseudotime to make bins
   # scale        = whether scale shwon expression levels from 0 to 1
-  # col          = colors for plots (several can be specified for superposed plot)
+  # col          = colors for plots (several can be specified)
   # ylim         = ylim for plots (can be manually adjusted)
-  # xlab         = label on x axis for plots (default = "Pseudoime")
+  # xlab         = label on x axis for plots (default = "Pseudotime")
   # ylab         = label on y axis for plots (default = "")
-  # main         = specified title for superposed plot, if not superposed, plot title will be feature name
+  # main         = specified title oplot
   
   
   # Get sample names by default
@@ -522,7 +539,8 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
       NA.list       <- c()
       for(b in x.dim){
         # Remove current point if number of values < 5
-        values      <- as.numeric(subx[,feature][as.character(subx$Bin) %in% as.character(b)])
+        values      <- as.numeric(subx[,feature][
+          as.character(subx$Bin) %in% as.character(b)])
         if(length(values) > 5){
           mean.expr <- c(mean.expr, mean(values))
         }else{
@@ -534,11 +552,13 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
     }
     
     # Formating final table
-    res_table <- as.data.frame(sapply(expr_table[,2:ncol(expr_table)],as.numeric))
+    res_table <- as.data.frame(sapply(
+      expr_table[,2:ncol(expr_table)],as.numeric))
     
     # If scale is precised
     if(scale){
-      res_table <- (res_table-min(res_table, na.rm = T))/(max(res_table, na.rm = T)-min(res_table, na.rm = T))
+      res_table <- (res_table-min(res_table, na.rm = T))/
+        (max(res_table, na.rm = T)-min(res_table, na.rm = T))
       ylim      <- c(0,1)
     }
     
@@ -559,7 +579,8 @@ CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
       par(new=TRUE)
       n <- n+1
     }
-    legend(x="topleft", inset=c(1,0), xpd=T, bty="n", legend = sample.names, col = col, lwd = lwd, text.font = 0.5)
+    legend(x="topleft", inset=c(1,0), xpd=T, bty="n", legend = sample.names, 
+           col = col, lwd = lwd, text.font = 0.5)
     par(new=F)
   }else{
     warnings(paste(feature, 'gene not found.' ))
@@ -602,7 +623,8 @@ EnsemblToGeneSymbol <- function(x, refindex, duplicate = T, sum.duplicate = T){
       y[i, "Gene.name"] <- y[i, "Gene.stable.ID"]
     }
     rownames(y) <- y$Gene.name
-    y <- y[, colnames(y) %!in% c("Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
+    y <- y[, colnames(y) %!in% c("Gene.stable.ID", "Gene.stable.ID.version", 
+                                 "Gene.name")]
   } else {
     y$Gene.name <- make.names(y$Gene.name, unique = TRUE)
     
@@ -611,16 +633,19 @@ EnsemblToGeneSymbol <- function(x, refindex, duplicate = T, sum.duplicate = T){
       for(g in non_unique_names){
         pattern          <- paste("^", g, "|", g, "/.[123456789]", sep = "")
         sub_table        <- y[grepl(pattern, y$Gene.name),]
-        sub_table        <- sub_table[, colnames(sub_table) %!in% c("Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
+        sub_table        <- sub_table[, colnames(sub_table) %!in% c(
+          "Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
         new_line <- c(paste(g, ".ALL", sep = ""), apply(sub_table, 2, sum))
         z <- rbind(z, new_line)
       }
       rownames(z) <- z[,1]
       z <- z[,2:ncol(z)]
-      colnames(z) <- colnames(y)[colnames(y) %!in% c("Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
+      colnames(z) <- colnames(y)[colnames(y) %!in% c(
+        "Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
     }
     rownames(y) <- y$Gene.name
-    y <- y[, colnames(y) %!in% c("Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
+    y <- y[, colnames(y) %!in% c(
+      "Gene.stable.ID", "Gene.stable.ID.version", "Gene.name")]
     y <- rbind(y, z)
   }
   return(y)
