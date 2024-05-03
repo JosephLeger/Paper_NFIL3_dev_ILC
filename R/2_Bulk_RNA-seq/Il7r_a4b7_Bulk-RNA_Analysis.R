@@ -1,0 +1,412 @@
+#!/usr/bin/env Rscript
+
+
+#===============================================================================
+# DESCRIPTION ------------------------------------------------------------------
+#===============================================================================
+
+
+
+
+#===============================================================================
+# SETUP ------------------------------------------------------------------------
+#===============================================================================
+
+rm(list=ls(all.names=TRUE))
+
+################################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+################################################################################
+
+PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
+DATA_DIR     <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/genes.results'
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/SampleSheet_Bulk_RNA.csv'
+COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/Comparisons_to_make.csv' 
+
+################################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+################################################################################
+
+setwd(PATH)
+
+# Load Packages and custom functions
+source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_functions.R')
+suppressPackageStartupMessages(library(Biobase))
+suppressPackageStartupMessages(library(stringr))
+suppressPackageStartupMessages(library(tximport))
+suppressPackageStartupMessages(library(pheatmap))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(sva))
+suppressPackageStartupMessages(library(edgeR))
+suppressPackageStartupMessages(library(org.Mm.eg.db))
+suppressPackageStartupMessages(library(EnhancedVolcano))
+suppressPackageStartupMessages(library(easylabel))
+
+# Create required directories
+dir.create(file.path(PATH, '/Figures'))
+dir.create(file.path(PATH, '/Saves'))
+
+dir.create(file.path(paste0(PATH, '/Figures'), 'Bulk_RNA-seq'))
+dir.create(file.path(paste0(PATH, '/Figures/Bulk_RNA-seq'), 'Il7r_a4b7'))
+dir.create(file.path(paste0(PATH, '/Saves'), 'Bulk_RNA-seq'))
+dir.create(file.path(paste0(PATH, '/Saves/Bulk_RNA-seq'), 'Il7r_a4b7'))
+
+# Set up path for figures and saves
+PATH_FIG  <- paste0(PATH, '/Figures/Bulk_RNA-seq/Il7r_a4b7')
+PATH_SAVE <- paste0(PATH, '/Saves/Bulk_RNA-seq/Il7r_a4b7')
+
+
+
+#===============================================================================
+# READING FILES ----------------------------------------------------------------
+#===============================================================================
+
+# Read metadata sample sheet and comparisons to make
+METADATA        <- read.table(SAMPLE_SHEET, header = T, sep = ',')
+COMPARISONS     <- read.csv(COMP_TO_MAKE)
+
+# Import files
+TXI             <- tximport(paste(DATA_DIR, METADATA$FileName, sep = '/'), 
+                            type = 'rsem')
+Table           <- as.data.frame(TXI$counts)
+colnames(Table) <- METADATA$SampleName
+
+# Save aggregated Table_Raw available in GEO
+write.table(Table, 
+            paste0(PATH_SAVE, '/Table_Raw.txt'), quote = F)
+
+
+
+#===============================================================================
+# DATA DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
+#===============================================================================
+
+# Make heatmaps by celltype
+for(n in names(table(METADATA$CellType))){
+  heatdata <- Table[colnames(Table) %in% 
+                      METADATA$SampleName[METADATA$CellType %in% n]]
+
+  # Eliminate low expressed genes for heatmap
+  heatdata$count <- apply(heatdata, 1, sum)
+  heatdata       <- subset(heatdata, count > 10)
+  heatdata$count <- NULL
+
+  # Plot and save heatmap
+  pheatmap(log2(heatdata+1), 
+           show_rownames = FALSE, 
+           treeheight_row = 50, 
+           treeheight_col = 50,
+           cluster_cols = FALSE,
+           main = n) 
+  dev.print(png, file=paste0(PATH_FIG, '/Heatmap_', n,'.png'), 
+            width=9, height=9, units='in', res=100)
+}
+
+
+# Make complete heatmap
+pheatdata       <- Table
+pheatdata$count <- apply(pheatdata, 1, sum)
+pheatdata       <- subset(pheatdata, count > 10)
+pheatdata$count <- NULL
+
+# Plot and save heatmap
+pheatmap(log2(pheatdata+1), 
+         show_rownames = FALSE, 
+         treeheight_row = 50,
+         treeheight_col = 50, 
+         luster_cols = FALSE)
+dev.print(png, file=paste0(PATH_FIG, '/Complete_Heatmap.png'), 
+          width=9, height=9, units='in', res=100)
+
+# Make dendrogram of raw data
+dendodata       <- t(Table)
+dist            <- dist(dendodata[ ,c(1:ncol(dendodata))], 
+                        diag=TRUE, 
+                        method = 'euclidian')
+hc              <- hclust(dist,
+                          method = 'complete')
+dendro_raw      <- plot(hc, 
+                        main = 'Raw Samples', 
+                        xlab = 'Samples', 
+                        sub = '')
+dev.print(png, file=paste0(PATH_FIG, '/Dendro_Raw.png'), 
+          width=9, height=9, units='in', res=100)
+
+
+
+#===============================================================================
+# QUANTILE NORMALIZATION -------------------------------------------------------
+#===============================================================================
+
+# Eliminate zero expressed genes
+cutoff         <- 1
+eliminate      <- which(apply(cpm(Table), 1, max) < cutoff)
+Table_filtered <- Table[-eliminate,]
+
+# Save aggregated Table after non-expressed genes removal
+write.table(Table_filtered, 
+            paste0(PATH_SAVE, '/Table_Filtered.txt'), quote = F)
+
+# Plot distribution before quantile-normalization
+Table_filtered %>% 
+  gather(Sample, Count) %>% 
+  ggplot(aes(Sample, Count)) + 
+  geom_boxplot(outlier.shape = NA) +
+  ylim(0, 60)
+dev.print(png, file=paste0(PATH_FIG, '/Distrib_Raw.png'), 
+          width=9, height=9, units='in', res=100)
+
+# Use custom function for quantile normalization
+Table_norm  <- Quantile_Normalization(Table_filtered)
+
+# Plot distribution after quantile normalization
+Table_norm %>% 
+  gather(Sample, Count) %>% 
+  ggplot(aes(Sample, Count)) + 
+  geom_boxplot(outlier.shape = NA) +
+  ylim(0, 60)
+dev.print(png, file=paste0(PATH_FIG, '/Distrib_QuantileNorm.png'), 
+          width=9, height=9, units='in', res=100)
+
+# Plot dendrogram after normalization and batch effect removal
+dendodata     <- t(Table_norm)
+dist          <- dist(dendodata[,c(1:ncol(dendodata))],
+                      diag=TRUE, 
+                      method = 'euclidian')
+hc            <- hclust(dist, 
+                        method = 'complete')
+plot(hc, main = '', xlab = 'Samples', sub = '')
+dev.print(png, file=paste0(PATH_FIG, '/Dendro_Norm.png'), 
+          width=9, height=9, units='in', res=100)
+
+# Save aggregated Table_Norm available in GEO
+write.table(Table_norm, 
+            paste0(PATH_SAVE, '/Table_Norm.txt'), quote = F)
+
+
+
+#===============================================================================
+# GENE SYMBOL ANNOTATION -------------------------------------------------------
+#===============================================================================
+
+ID     <- rownames(Table_norm)
+mapped <- mapIds(org.Mm.eg.db, 
+                 keys = ID,
+                 keytype = 'ENSEMBL', 
+                 column = 'SYMBOL')
+Symbol <- c()
+for(j in 1:length(ID)){
+  if(!is.na(mapped[j])){
+    Symbol <- c(Symbol, mapped[j])
+  }else{
+    Symbol <- c(Symbol, ID[j])
+  }
+}
+Table_annotated <- cbind(Table_norm, Symbol = Symbol)
+Table_annotated <- Table_annotated[,c(ncol(Table_annotated), 
+                                      1:(ncol(Table_annotated)-1))]
+
+# Save table with annotated gene symbol
+write.table(Table_annotated, 
+            paste0(PATH_SAVE, '/Table_Annotated.txt'), quote = F)
+
+
+
+#===============================================================================
+# FITTING MODEL ----------------------------------------------------------------
+#===============================================================================
+
+# Create DGEList object
+DGE_0     <- DGEList(Table_filtered)
+
+## PREPROCESSGING - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+DGE_0     <- calcNormFactors(DGE_0, method = 'TMM')
+
+# Remove low expressed genes for the following analysis
+cutoff    <- 10
+eliminate <- which(apply(cpm(DGE_0), 1, max) < cutoff)
+DGE       <- DGE_0[-eliminate,] 
+
+# Show sample distribution before VOOM
+samples   <- METADATA$SampleName
+group     <- METADATA$CellType
+batch     <- as.character(METADATA$Batch)
+
+colors <- c()
+for(i in group){
+  for(g in 1:length(names(table(group)))){
+    if(i == names(table(group))[g]){
+      colors <- c(colors, g)
+    }
+  }
+}
+plotMDS(DGE, col = colors)
+dev.print(png, file=paste0(PATH_FIG, '/plotMDS_before.png'), 
+          width=9, height=9, units='in', res=100)
+
+
+## VOOM TRANSFORMATION AND CALCULATION OF VARIANCE WEIGHT - - - - - - - - - - -
+
+model <- model.matrix(~0 + group)
+
+y_0   <- voom(DGE_0, model, plot = TRUE)
+y     <- voom(DGE, model, plot = TRUE)
+plotMDS(y, col = colors)
+dev.print(png, file=paste0(PATH_FIG, '/plotMDS_after.png'), 
+          width=9, height=9, units='in', res=100)
+fit   <- lmFit(y, model)
+
+
+
+#===============================================================================
+# MAKE COMPARISONS -------------------------------------------------------------
+#===============================================================================
+
+Results_list <- list()
+
+for(i in 1:nrow(COMPARISONS)){
+  
+  ## SELECT COMPARISON ---------------------------------------------------------
+  # Set current comparison members
+  control <- COMPARISONS$Control[i] 
+  tested  <- COMPARISONS$Tested[i]
+  title   <- paste(tested, "vs", control, sep = "_")
+  pattern <- paste0("group", tested, " - ", "group", control)
+  print(pattern)
+  
+  # Run comparison
+  contr   <- makeContrasts(pattern,  levels = colnames(coef(fit)))
+  tmp     <- contrasts.fit(fit, contr)
+  tmp     <- eBayes(tmp)
+  
+  result  <- topTable(tmp, sort.by = "P", n = Inf)
+  
+  # Adding gene symbol
+  symbol <- mapIds(org.Mm.eg.db, keys = rownames(result), keytype = "ENSEMBL", 
+                   column = "SYMBOL")
+  symbol.completed <- c()
+  for(j in 1:nrow(result)){
+    if(!is.na(symbol[j])){
+      symbol.completed <- c(symbol.completed, symbol[j])
+    }else{
+      symbol.completed <- c(symbol.completed, rownames(result)[j])
+    }
+  }
+  result$Symbol <- symbol.completed
+  result <- result[,c("Symbol", 
+                      colnames(result)[colnames(result) %!in% "Symbol"])]
+  result <- result[order(rownames(result)),]
+  Results_list[[title]] <- result
+  
+  ## SAVE RESULT TABLE ---------------------------------------------------------
+  write.table(result, paste0(PATH_SAVE, '/LimmaStats_', title, '.txt'), 
+              quote = F)
+  
+  
+  ## PLOT MA -------------------------------------------------------------------
+  ggplot(as.data.frame(result), 
+         aes(x = as.numeric(AveExpr), y = as.numeric(logFC))) +
+    geom_point() +
+    ggtitle(title) +
+    labs(x = 'Log10(baseMean)', y = 'Log2 FoldChange') +
+    scale_color_manual('Significant', values = ColorBlind[c(1,6)])
+  ggsave(paste0(PATH_FIG, '/', title, '_MAplot.png'),  
+         width = 3000, height = 2500, units = "px")
+  
+  
+  ## VOLCANO PLOT WITH PVALUE --------------------------------------------------
+  keyvals <- ifelse(
+    result$logFC < -1 & result$P.Value < 0.05, 'royalblue',
+    ifelse(result$P.Value < 0.05 & result$logFC > 1, 'red',
+           'grey'))
+  result$keyvals <- keyvals
+  
+  
+  keyvals[is.na(keyvals)]                <- 'grey'
+  names(keyvals)[keyvals == 'red']       <- 'Up'
+  names(keyvals)[keyvals == 'grey']      <- 'NS'
+  names(keyvals)[keyvals == 'royalblue'] <- 'Down'
+  # Draw Volcano plot
+  EnhancedVolcano(result , lab = result$Symbol, x = 'logFC', y = 'P.Value', 
+                  title = title, subtitle = '',
+                  legendPosition = 'right',
+                  selectLab = rownames(result$Symbol)[
+                    which(names(keyvals) %in% c('Up', 'Down'))],
+                  pCutoff = 0.05, FCcutoff = 1, 
+                  pointSize = 1.2, labSize = 3,
+                  colCustom = keyvals, colAlpha = 1,
+                  ylab = bquote(~-Log[10] ~ italic(P.Value)))
+  ggsave(paste0(PATH_FIG, '/', title, '_Volcano_pval.png'), 
+         width = 3000, height = 2500, units = "px")
+  
+  ## SAVE GENE LIST FOR PVALUE -------------------------------------------------
+  UP   <- unique(result$Symbol[result$keyvals == "red"])
+  DOWN <- unique(result$Symbol[result$keyvals == "royalblue"])
+  
+  write.table(UP, paste0(PATH_SAVE, '/', title, '_UP.txt'), 
+              row.names = F, col.names = F, quote = F)
+  write.table(DOWN, paste0(PATH_SAVE, '/', title, '_DOWN.txt'),
+              row.names = F, col.names = F, quote = F)
+}
+
+
+## CUSTOM VOLCANOPLOT ----------------------------------------------------------
+rownames(result) <- make.unique(result$Symbol)
+easyVolcano(result, x='logFC', y='P.Value', fccut = 1, 
+            colScheme = c("darkgrey", "blue", "darkgrey", "darkgrey", "red"))
+
+
+
+#===============================================================================
+# FINAL TABLE RESULT -----------------------------------------------------------
+#===============================================================================
+# Generate full table annotated with expression and stats
+FULL <- read.table(paste0(PATH_SAVE, '/Table_Annotated.txt'), header = T)
+
+# Read results files 
+Results_list <- list()
+files        <- list.files(PATH_SAVE)
+files        <- files[grepl('LimmaStats', files)]
+for(f in files){
+  name                 <- str_remove(str_remove(f, 'LimmaStats_'), '.txt')
+  Results_list[[name]] <- read.table(paste0(PATH_SAVE, '/', f))
+}
+
+# Calculate mean expression for each celltype
+for(n in names(table(METADATA$CellType))){
+  subx <- FULL[,METADATA$SampleName[METADATA$CellType %in% n]]
+  mean <- rowMeans(subx)
+  FULL <- cbind(FULL, newcol = mean)
+  colnames(FULL)[ncol(FULL)] <- paste0('mean_', n)
+}
+
+# Separate genes with and without statistical results
+plus <- FULL[rownames(FULL) %!in% rownames(Results_list[[1]]),]
+FULL <- FULL[rownames(FULL) %in% rownames(Results_list[[1]]),]
+
+# Add statistics 
+for(i in 1:length(Results_list)){
+  Stats <- Results_list[[i]]
+  Stats <- Stats[,c('logFC', 'P.Value', 'adj.P.Val')]
+  colnames(Stats) <- paste0(names(Results_list[i]), 
+                            c('_logFC', '_pval', '_padj'))
+  FULL <- cbind(FULL, Stats)
+}
+
+# Add genes with no statistical results
+for(i in 1:(ncol(FULL)-ncol(plus))){
+  plus <- cbind(plus, NA)
+  colnames(plus)[ncol(plus)] <- colnames(FULL)[ncol(plus)]
+}
+FULL <- rbind(FULL, plus)
+
+# Save final table
+write.table(FULL, paste0(PATH_SAVE, '/Table_Results.txt'), 
+            quote = F, sep = '\t')
+
+# Save Supplementary Table 1
+write.table(FULL[,c(1, 14:ncol(FULL))], paste0(PATH_SAVE, '/Supplementary_Table_1.txt'), 
+            quote = F, sep = '\t')
+
+
+
