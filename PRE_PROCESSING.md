@@ -84,7 +84,7 @@ sh BowtieCheck.sh -N _sorted -T 10 -R false Mapped/mm39/BAM
 
 # Merge BAM files and BW generation
 sh mergeBAM.sh -M DNAse-seq -N _Clum_Trimmed_sorted_filtered -R true Mapped/mm39/BAM SRA_list_DNAse-seq.csv
-sh Bam2BW.sh -N _merged -F bigwig -M RPKM -R true Mapped/mm39/BAM
+sh BAM2BW.sh -N _merged -F bigwig -M RPKM -R true Mapped/mm39/BAM
 
 # Peak calling with MACS2
 sh PeakyFinders.sh -U 'MACS2' -N _merged Mapped/mm39/BAM
