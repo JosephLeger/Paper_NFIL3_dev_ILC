@@ -3,6 +3,7 @@
 This repository contains codes and resources used to perform post-processing DNase-seq, Bulk RNA-seq and scRNA-seq data analysis.  
 Information about pre-processing steps are precised in PRE-PROCESSING.md
 
+Complete explaination is avaible [here](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
 
 ## Session Info
 ```R
