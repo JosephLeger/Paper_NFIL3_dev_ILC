@@ -6,10 +6,9 @@
 #Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
 #         https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
 
-# First step for a new and better integration of all WT datasets
+# First step for a new and better integration of all datasets
 # Integration used here is based on Clustering Similarity Spectrum (CSS) method
 # After QC, Integration and outlier elimination, data are clustered 
-# Result file is ready for pseudotime analysis on Step_02
 
 
 
