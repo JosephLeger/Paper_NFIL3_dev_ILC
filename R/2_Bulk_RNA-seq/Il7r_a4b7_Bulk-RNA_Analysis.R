@@ -5,7 +5,7 @@
 #===============================================================================
 # Script used to perform differential gene expression analysis of Bulk RNA-seq.
 #
-# Files are loaded using TXImport.
+# Load files using TXImport.
 # Apply quantile normalization.
 # Perform statistical DEG analysis using Limma.
 
