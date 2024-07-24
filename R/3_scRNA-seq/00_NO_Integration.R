@@ -5,12 +5,15 @@
 #===============================================================================
 # Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
 # https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
-
-# Exploration of datasets containing only already described ILC early precursors
-# Data are filtered during QC step, and then LogNormalized and scaled
-# Regression of cell cycle and mitochondrial genes is applied during scaling
-# Resulting data are clustered for celltype identification using ImmGen.org
-# Outliers are removed based on this annotation
+#
+# Exploration of datasets containing already described ILC early precursors
+#
+# Load datasets from a same batch and convert them in a Seurat Object
+# Perform QC and filter samples separately
+# Lognormalize and scale merged datasets
+# Apply cell cycle genes regression during scaling
+# Perform clustering and identify cell types using ImmGen.org
+# Remove outliers based on this identification
 
 
 
