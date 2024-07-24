@@ -3,15 +3,20 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-#Based on : https://satijalab.org/seurat/archive/v3.1/integration.html 
+# Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
 # https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
 #
-# Data are filtered during QC step, and then LogNormalized and scaled
-# Regression of cell cycle and mitochondrial genes is applied during scaling
-# Integration used here is based on Clustering Similarity Spectrum (CSS) method
-# Resulting data are clustered for celltype identification using ImmGen.org
-# Outliers are removed based on this annotation
-# Result file is ready for pseudotime analysis on Step_02
+# Integration CSS of WT ILC Il7LT+ intermediates
+#
+# Load datasets from distinct batches and convert them in a Seurat Object
+# Perform QC and filter samples separately
+# Lognormalize and scale merged datasets
+# Apply cell cycle and mithochondrial genes regression during scaling
+# Integrate experiments using Cluster Similarity Spectrum (CSS)
+# Perform clustering and identify cell types using ImmGen.org
+# Quantify and remove outliers based on this identification
+# Visualize key genes expression
+# Save RDS file used as input for the next step
 
 
 
