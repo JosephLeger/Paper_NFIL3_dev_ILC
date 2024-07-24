@@ -25,8 +25,8 @@ rm(list=ls(all.names=TRUE))
 
 PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
 DATA_DIR     <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/genes.results'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/SampleSheet_Bulk_RNA.csv'
-COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/Comparisons_to_make.csv' 
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/SampleSheet_Bulk_RNA_Il7r_a4b7.csv'
+COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/Comparisons_to_make_Il7r_a4b7.csv' 
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
