@@ -3,7 +3,13 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-
+# Pseudotime analysis integrating NFIL3-KO and TOX-KO ILC intermediates
+#
+# Load input files generated during previous steps
+# Perform pseudotime reconstruction using Slingshot
+# Save pseudotime cell order by trajectories in Seurat Object metadata
+# Analyse samples distribution inside trajectories
+# Draw gene expression variations across pseudotime
 
 
 
