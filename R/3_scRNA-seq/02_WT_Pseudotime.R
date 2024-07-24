@@ -3,7 +3,14 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-
+# Pseudotemporal trajectories reconstruction from WT ILC model
+#
+# Load input files generated during previous steps
+# Perform pseudotime reconstruction using Slingshot
+# Save pseudotime cell order by trajectories in Seurat Object metadata
+# Analyse samples distribution inside trajectories
+# Draw gene expression variations across pseudotime
+# Perform K-means clustering on all TF expression variations
 
 
 
@@ -50,7 +57,7 @@ TF_list <- read.table('C:/Users/E15639P/Data/Lists/masterTFlist.txt')[,1]
 TF_fam  <- readRDS(paste0(PATH, '/Saves/DNAse-seq/TF_fam.RDS'))
 
 
-# Set reductio nto use and plot axis limits
+# Set reduction to use and plot axis limits
 red    <- 'rev_umap_cssz2'
 xlimit <- c(min(data@reductions[[red]]@cell.embeddings[,1]),
             max(data@reductions[[red]]@cell.embeddings[,1]))
