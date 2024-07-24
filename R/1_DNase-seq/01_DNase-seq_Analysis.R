@@ -8,11 +8,6 @@
 # Apply DiffBind to identify differentially opened chromatin regions.
 # Set up subgroups of peaks based on their accessibility pattern.
 # Define TF subfamilies of interest based on HOMER annotation results.
-#
-# Required inputs are BAM files and Peak files. 
-# BAM were mapped using Bowtie2 and peak calling was done using MACS2.
-# A SampleSheet in CSV format describing these files is loaded as metadata.
-# (see "NFIL3_dev_ILC/data/SampleSheet_DNAse.csv").
 
 
 
