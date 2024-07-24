@@ -3,13 +3,13 @@
 #===============================================================================
 # DESCRIPTION ------------------------------------------------------------------
 #===============================================================================
-# Script used to perform differential gene expression analysis of Bulk RNA-seq.
+# Script used to perform differential gene expression analysis of Bulk RNA-seq
 #
-# Load files using TXImport.
-# Check sample distribution to identify potential outliers.
-# Apply quantile normalization.
-# Annotate gene symbols using org.Mm.eg.db package.
-# Perform statistical DEG analysis using Limma.
+# Load files using TXImport
+# Check sample distribution to identify potential outliers
+# Apply quantile normalization
+# Annotate gene symbols using org.Mm.eg.db package
+# Perform statistical DEG analysis using Limma
 
 
 
