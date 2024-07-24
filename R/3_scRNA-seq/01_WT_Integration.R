@@ -4,7 +4,7 @@
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
 #Based on : https://satijalab.org/seurat/archive/v3.1/integration.html 
-#         https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
+# https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
 
 # First step for a new and better integration of all WT datasets
 # Integration used here is based on Clustering Similarity Spectrum (CSS) method
