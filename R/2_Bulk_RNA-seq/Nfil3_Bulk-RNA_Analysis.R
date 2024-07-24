@@ -1,10 +1,16 @@
 #!/usr/bin/env Rscript
 
-
 #===============================================================================
 # DESCRIPTION ------------------------------------------------------------------
 #===============================================================================
-
+# Script used to perform differential gene expression analysis of Bulk RNA-seq.
+#
+# Load files using TXImport.
+# Check sample distribution to identify potential outliers.
+# Apply quantile normalization.
+# Remove batch effect using CombatSeq.
+# Annotate gene symbols using org.Mm.eg.db package.
+# Perform statistical DEG analysis using Limma.
 
 
 
@@ -20,8 +26,8 @@ rm(list=ls(all.names=TRUE))
 
 PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
 DATA_DIR     <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/genes.results'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/SampleSheet_Bulk_RNA.csv'
-COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/Comparisons_to_make.csv' 
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/SampleSheet_Bulk_RNA_Nfil3.csv'
+COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/Comparisons_to_make_Nfil3.csv' 
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -77,7 +83,7 @@ write.table(Table,
 
 
 #===============================================================================
-# DATA DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
+# SAMPLE DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
 #===============================================================================
 
 # Make heatmaps by celltype
