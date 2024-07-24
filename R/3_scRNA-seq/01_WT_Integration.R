@@ -5,10 +5,12 @@
 #===============================================================================
 #Based on : https://satijalab.org/seurat/archive/v3.1/integration.html 
 # https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
-
-# First step for a new and better integration of all WT datasets
+#
+# Data are filtered during QC step, and then LogNormalized and scaled
+# Regression of cell cycle and mitochondrial genes is applied during scaling
 # Integration used here is based on Clustering Similarity Spectrum (CSS) method
-# After QC, Integration and outlier elimination, data are clustered 
+# Resulting data are clustered for celltype identification using ImmGen.org
+# Outliers are removed based on this annotation
 # Result file is ready for pseudotime analysis on Step_02
 
 
