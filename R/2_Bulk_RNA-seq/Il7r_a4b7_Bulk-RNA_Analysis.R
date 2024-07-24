@@ -6,7 +6,9 @@
 # Script used to perform differential gene expression analysis of Bulk RNA-seq.
 #
 # Load files using TXImport.
+# Check sample distribution to identify potential outliers.
 # Apply quantile normalization.
+# Annotate gene symbols using org.Mm.eg.db package.
 # Perform statistical DEG analysis using Limma.
 
 
@@ -81,7 +83,7 @@ write.table(Table,
 
 
 #===============================================================================
-# DATA DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
+# SAMPLE DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
 #===============================================================================
 
 # Make heatmaps by celltype
