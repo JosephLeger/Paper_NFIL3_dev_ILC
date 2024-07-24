@@ -3,9 +3,16 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-# Perform DiffBind using data pre-filtered with Clumpify
-# Peak Calling was performed using MACS2
-# DiffBind FRD cutoff is setted to 0.1 (default = 0.05)
+# Script used to perform chromatin accessibility comparisons bewteen conditions.
+#
+# Apply DiffBind to identify differentially opened chromatin regions.
+# Set up subgroups of peaks based on their accessibility pattern.
+# Define TF subfamilies of interest based on HOMER annotation results.
+#
+# Required inputs are BAM files and Peak files. 
+# BAM were mapped using Bowtie2 and peak calling was done using MACS2.
+# A SampleSheet in CSV format describing these files is loaded as metadata.
+# (see "NFIL3_dev_ILC/data/SampleSheet_DNAse.csv").
 
 
 
@@ -401,6 +408,7 @@ write.table(ALP_open.BED,
 # Explore HOMER motif enrichment results
 # Here are written only the first member of top 5 TF families identified, and
 # then we add all members of its Subfamily
+# based on : http://www.edgar-wingender.de/huTF_classification.html
 
 TF_fam <- list()
 
@@ -408,7 +416,7 @@ TF_fam <- list()
 
 # 1) ETS1 (ETS)
 # 2) RUNX (Runt)
-# 3) AtGRF6 (GRF) /!\ vegetals
+# 3) AtGRF6 (GRF) /!\ plants
 # 4) CTCF (Zf)
 # 5) Ascl1 (bHLH)
 
