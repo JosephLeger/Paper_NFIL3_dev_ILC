@@ -3,12 +3,20 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-#Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
-#         https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
-
-# First step for a new and better integration of all datasets
-# Integration used here is based on Clustering Similarity Spectrum (CSS) method
-# After QC, Integration and outlier elimination, data are clustered 
+# Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
+# https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
+#
+# Integration CSS of WT and NFIL3-KO ILC Il7LT+ intermediates
+#
+# Load datasets from distinct batches and convert them in a Seurat Object
+# Perform QC and filter samples separately
+# Lognormalize and scale merged datasets
+# Apply cell cycle and mithochondrial genes regression during scaling
+# Integrate experiments using Cluster Similarity Spectrum (CSS)
+# Perform clustering and identify cell types using ImmGen.org
+# Quantify and remove outliers based on this identification
+# Visualize key genes expression
+# Save RDS file used as input for the next step
 
 
 
