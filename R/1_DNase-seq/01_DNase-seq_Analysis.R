@@ -3,11 +3,11 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-# Script used to perform chromatin accessibility comparisons bewteen conditions.
+# Script used to perform chromatin accessibility comparisons bewteen conditions
 #
-# Apply DiffBind to identify differentially opened chromatin regions.
-# Set up subgroups of peaks based on their accessibility pattern.
-# Define TF subfamilies of interest based on HOMER annotation results.
+# Apply DiffBind to identify differentially opened chromatin regions
+# Set up subgroups of peaks based on their accessibility pattern
+# Define TF subfamilies of interest based on HOMER annotation results
 
 
 
