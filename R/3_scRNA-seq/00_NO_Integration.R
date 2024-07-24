@@ -3,8 +3,8 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-#Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
-#           https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
+# Based on : https://satijalab.org/seurat/archive/v3.1/integration.html
+# https://github.com/quadbiolab/simspec/blob/master/vignette/vignette.md
 
 # Exploration of datasets containing only already described ILC early precursors
 # Data are filtered during QC step, and then LogNormalized and scaled
