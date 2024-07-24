@@ -3,7 +3,12 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
-
+# Gene Regulatory Network analysis based on WT ILC developmental model
+#
+# Prepare matrix of cells ordered by pseudotime
+# Launch LEAP algorithm on a calculation cluster
+# Explore LEAP results
+# Prepare the resulting gene regulatory network in a .gml file for Gephi  
 
 
 
@@ -56,7 +61,7 @@ data     <- readRDS(paste0(PATH_SAVE, '/5_Pseudotime.rds'))
 ## LEAP MATRIX PREPARATION -----------------------------------------------------
 #===============================================================================
 
-## Generate matrix and index for ILC trajectory
+# Generate matrix and index for ILC trajectory
 result_S1 <- LeapMatrix(data, trajectory = 'Slingshot_1', suffix = 'WT',  
                         min.cells = 50, write = T, 
                         dir = paste0(PATH_SAVE, '/LEAP'), slot = 'data')
