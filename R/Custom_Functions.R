@@ -281,7 +281,7 @@ AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(),
 
 DrawExpr <- function(x, bin.number = 21, feature.list, 
                      by.order = F, std = F, scale = F, scale.method = 0,
-                     superposed = F, write = F, dir = getwd(), 
+                     superposed = F, compare.with = F, write = F, dir = getwd(), 
                      col = "black", lwd = 2, ylim = c(-0.75, 2), 
                      xlab = "Pseudotime", ylab = "", main = "Untitled", 
                      width = 900, height = 800){
@@ -314,7 +314,7 @@ DrawExpr <- function(x, bin.number = 21, feature.list,
   }
   
   # Subset table for more efficiency during following steps
-  x <- x[colnames(x) %in% c('Pseudotime', feature.list),]
+  x <- x[,colnames(x) %in% c('Pseudotime', feature.list)]
   
   
   # Attributes Bin to each cell
