@@ -403,8 +403,7 @@ write.table(ALP_open.BED,
 # Explore HOMER motif enrichment results
 # Here are written only the first member of top 5 TF families identified, and
 # then we add all members of its Subfamily
-# based on : http://www.edgar-wingender.de/huTF_classification.html
-
+# based on : http://www.edgar-wingender.de/muTF_classification-1.html
 TF_fam <- list()
 
 ## MOTIFS OF [-][+] PATTERN ----------------------------------------------------
