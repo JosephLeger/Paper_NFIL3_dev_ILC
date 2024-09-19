@@ -22,10 +22,7 @@ star                        2.7.5a
 sh QC.sh Raw
 
 # Trimming to remove adapters
-# For data from GSE113765 (+ ILCP3)
-sh Trim.sh -S 4:15 -L 5 -T 3 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
-# For data from GSE250011 and "TULIP"
-sh Trim.sh -S 4:15 -L 3 -T 3 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
+sh Trim.sh -S 4:15 -L 5 -T 5 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
 
 # Quality Check after trimming
 sh QC.sh Trimmed/Trimmomatic/Paired
@@ -38,9 +35,7 @@ sh RSEM.sh PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
 ```bash
 # Trimming to remove adapters
 trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
-ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:3 MINLEN:36 
-trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
-ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:3 TRAILING:3 MINLEN:36 
+ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 
 
 # RSEM alignment 
 rsem-calculate-expression -p 8 --paired-end --star --star-gzipped-read-file $R1 $R2 ./Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
