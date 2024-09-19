@@ -22,7 +22,10 @@ star                        2.7.5a
 sh QC.sh Raw
 
 # Trimming to remove adapters
-sh Trim.sh -S 4:15 -L 5 -T 5 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
+# For Batch 2 from GSEXXXXXX
+sh Trim.sh -S 4:15 -L 5 -T 3 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
+# For Batch 1 and Batch 3 from GSEXXXXXX 
+sh Trim.sh -S 4:15 -L 3 -T 3 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 PE Raw
 
 # Quality Check after trimming
 sh QC.sh Trimmed/Trimmomatic/Paired
@@ -34,8 +37,12 @@ sh RSEM.sh PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
 ### Using directly tools
 ```bash
 # Trimming to remove adapters
+# For Batch 2 from GSEXXXXXX
 trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
-ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 
+ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:3 MINLEN:36
+# For Batch 1 and Batch 3 from GSEXXXXXX 
+trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
+ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:3 TRAILING:3 MINLEN:36 
 
 # RSEM alignment 
 rsem-calculate-expression -p 8 --paired-end --star --star-gzipped-read-file $R1 $R2 ./Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
@@ -62,31 +69,31 @@ homer                       4.11
 ### Using custom pipeline
 ```bash
 # Quality Check of raw FASTQ files
-sh QC.sh Raw
+sh 1_QC.sh Raw
 
 # Trimming to remove adapters and duplicated reads
-sh Trim.sh -U 'Both' -S 4:15 -L 5 -T 5 -M 36 -I ../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7 -D True SE Raw
+sh 2_Trim.sh -U 'Both' -S 4:15 -L 5 -T 5 -M 36 -I ../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7 -D True SE Raw
 
 # Quality Check after trimming
-sh QC.sh Trimmed/Trimmomatic
+sh 1_QC.sh Trimmed/Trimmomatic
 
 # Mapping using Bowtie2
-sh Bowtie2.sh SE Trimmed/Trimmomatic ../Ref/refdata-Bowtie2-mm39/mm39
+sh 3_Bowtie2.sh SE Trimmed/Trimmomatic ../Ref/refdata-Bowtie2-mm39/mm39
 
 # Filtering
-sh BowtieCheck.sh -N _sorted -T 10 -R false Mapped/mm39/BAM 
+sh 4_BowtieCheck.sh -N _sorted -T 10 -R false Mapped/mm39/BAM 
 
 # Merge BAM files and BW generation
 sh mergeBAM.sh -M DNAse-seq -N _Clum_Trimmed_sorted_filtered -R true Mapped/mm39/BAM SRA_list_DNAse-seq.csv
 sh BAM2BW.sh -N _merged -F bigwig -M RPKM -R true Mapped/mm39/BAM
 
 # Peak calling with MACS2
-sh PeakyFinders.sh -U 'MACS2' -N _merged Mapped/mm39/BAM
-sh PeakyFinders.sh -U 'MACS2' -N _Clum_Trimmed_sorted_filtered Mapped/mm39/BAM
+sh 5_PeakyFinders.sh -U 'MACS2' -N _merged Mapped/mm39/BAM
+sh 5_PeakyFinders.sh -U 'MACS2' -N _Clum_Trimmed_sorted_filtered Mapped/mm39/BAM
 
 # Motif enrichment analysis and peak annotation with HOMER from patterns identified by R DiffBind
-sh 8_Annotate.sh -N '[' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ../Ref/Mus_musculus.GRCm39.108.gtf
-sh 8_Annotate.sh -N 'ALP_open' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ../Ref/Mus_musculus.GRCm39.108.gtf
+sh 6_Annotate.sh -N '[' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ../Ref/Mus_musculus.GRCm39.108.gtf
+sh 6_Annotate.sh -N 'ALP_open' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ../Ref/Mus_musculus.GRCm39.108.gtf
 ```
 
 ### Using directly tools
