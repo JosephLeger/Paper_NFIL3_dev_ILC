@@ -38,10 +38,9 @@ sh RSEM.sh PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
 ```bash
 # Trimming to remove adapters
 trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
-SLIDINGWINDOW:4:15 LEADING:5 TRAILING:3 MINLEN:36 ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10
-
+ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:3 MINLEN:36 
 trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
-SLIDINGWINDOW:4:15 LEADING:3 TRAILING:3 MINLEN:36 ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10
+ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:3 TRAILING:3 MINLEN:36 
 
 # RSEM alignment 
 rsem-calculate-expression -p 8 --paired-end --star --star-gzipped-read-file $R1 $R2 ./Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
