@@ -16,7 +16,7 @@ rsem                        1.3.2
 star                        2.7.5a
 ```
 
-### Using custom pipeline
+### Using [Custom Pipeline](https://github.com/JosephLeger/Workflow_RNA-seq)
 ```bash
 # Quality Check of raw FASTQ files
 sh QC.sh Raw
@@ -66,7 +66,7 @@ macs2                       2.2.7.1
 homer                       4.11
 ```
 
-### Using custom pipeline
+### Using [Custom Pipeline](https://github.com/JosephLeger/Workflow_ChIP-like)
 ```bash
 # Quality Check of raw FASTQ files
 sh 1_QC.sh Raw
