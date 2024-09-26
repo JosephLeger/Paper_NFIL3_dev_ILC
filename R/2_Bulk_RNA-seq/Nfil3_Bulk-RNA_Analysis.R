@@ -188,6 +188,27 @@ plot(hc, main = '', xlab = 'Samples', sub = '')
 dev.print(png, file=paste0(PATH_FIG, '/Dendro_Norm.png'), 
           width=9, height=9, units='in', res=100)
 
+# Plot PCA of sample distribution
+pca_res <- prcomp(t(Table_batched))
+pca_sum <- summary(pca_res)
+
+label_x = paste0('PC1 ', '(', round(pca_sum[["importance"]][2]*100), '%)')
+label_y = paste0('PC2 ', '(', round(pca_sum[["importance"]][5]*100), '%)')
+
+pca_t   <- data.frame(
+  pca_res$x, 
+  Sample=factor(METADATA$CellType, 
+                levels = c('ALP', 'sEILP', 'cEILP', 'ILCP', 'GFP', 'NFIL3')))
+
+ggplot(pca_t, aes(x=PC1, y=PC2, color=Sample)) +
+  theme_classic() +
+  geom_point(size = 5, shape = 20) +
+  scale_color_manual(
+    values=c(ColorBlind[c(10,9,8)], 'darkred', ColorBlind[c(3,5)])) +
+  xlab(label_x) + ylab(label_y)
+dev.print(png, file=paste0(PATH_FIG, '/PCA_plot.png'), 
+          width=9, height=9, units='in', res=100)
+
 # Save aggregated Table_Norm available in GEO
 write.table(Table_batched, 
             paste0(PATH_SAVE, '/Table_Norm.txt'), quote = F)
