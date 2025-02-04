@@ -124,7 +124,7 @@ findMotifsGenome.pl ${file} ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.f
 ### Requirements
 ```
 Name                        Version
-cellranger                  7.2.0
+cellranger                  7.0.1
 ```
 
 ### Using directly tools
