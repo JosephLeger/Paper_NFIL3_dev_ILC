@@ -103,6 +103,11 @@ VALIDATION_STRINGENCY=LENIENT TMP_DIR=tmp SORT_ORDER=coordinate
 samtools view -h ${file} | samtools view -b -Sq 10  > ${bam_filtered}
 samtools index ${bam_filtered} ${bai_filtered}
 
+# Merge BAM files and BW generation
+samtools merge -o Mapped/mm39/BAM/${output}.bam ${list_files}
+samtools index Mapped/mm39/BAM/${output}.bam
+bamCoverage --outFileFormat bigwig -b ${file}.bam -o Mapped/mm39/BIGWIG/${file}.bw
+
 # Peak calling with MACS2
 macs2 callpeak -t ${file} -f BAM -g 1.87e9 --nomodel --shift 50 --extsize 100 -n ${output} --outdir ${outdir}
 
