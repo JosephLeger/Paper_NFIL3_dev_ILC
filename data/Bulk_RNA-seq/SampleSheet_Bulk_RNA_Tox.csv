@@ -1,10 +1,4 @@
 FileName,SampleName,CellType,Batch
-1_ALP_WT1.genes.results,ALP_WT_1,ALP_WT,4
-2_ALP_WT2.genes.results,ALP_WT_2,ALP_WT,4
-3_ALP_WT3.genes.results,ALP_WT_3,ALP_WT,4
-4_ALP_KO1.genes.results,ALP_KO_1,ALP_KO,4
-5_ALP_KO2.genes.results,ALP_KO_2,ALP_KO,4
-6_ALP_KO3.genes.results,ALP_KO_3,ALP_KO,4
 7_GFP_WT1.genes.results,GFP_WT_1,GFP_WT,4
 8_GFP_WT2.genes.results,GFP_WT_2,GFP_WT,4
 9_GFP_WT3.genes.results,GFP_WT_3,GFP_WT,4
