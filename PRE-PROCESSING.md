@@ -93,29 +93,29 @@ sh 6_Annotate.sh -N '' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks .
 ### Using directly tools
 ```bash
 # Trimming to remove duplicated reads and adapters
-clumpify.sh in=${file} out=${output} dedupe=t subs=0
-trimmomatic SE -threads 4 ${file} ${output} SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 ILLUMINACLIP:../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7
+clumpify.sh in=${file}.fastq out=${file}_Clum.fastq dedupe=t subs=0
+trimmomatic SE -threads 4 ${file}_Clum.fastq ${file}_Clum_Trimmed.fastq SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 ILLUMINACLIP:../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7
 
 # Mapping using Bowtie2
-bowtie2 -p 2 -N 0 -x ../Ref/refdata-Bowtie2-mm39/mm39 -U ${file} -S Mapped/mm39/SAM/${file}.sam
+bowtie2 -p 2 -N 0 -x ../Ref/refdata-Bowtie2-mm39/mm39 -U ${file}.fastq -S Mapped/mm39/SAM/${file}.sam
 picard SortSam INPUT=Mapped/mm39/SAM/${file}.sam OUTPUT=Mapped/mm39/BAM/${file}_sorted.bam \
 VALIDATION_STRINGENCY=LENIENT TMP_DIR=tmp SORT_ORDER=coordinate
 
 # Filtering
-samtools view -h ${file} | samtools view -b -Sq 10  > ${bam_filtered}
-samtools index ${bam_filtered} ${bai_filtered}
+samtools view -h ${file}.bam | samtools view -b -Sq 10  > ${file}_filtered.bam
+samtools index ${file}_filtered.bam ${bam}_filtered.bai
 
 # Merge BAM files and BW generation
-samtools merge -o Mapped/mm39/BAM/${output}.bam ${list_files}
-samtools index Mapped/mm39/BAM/${output}.bam
+samtools merge -o Mapped/mm39/BAM/${file}.bam ${files_to_merge}
+samtools index Mapped/mm39/BAM/${file}.bam Mapped/mm39/BAM/${file}.bai
 bamCoverage --outFileFormat bigwig -b ${file}.bam -o Mapped/mm39/BIGWIG/${file}.bw
 
 # Peak calling with MACS2
-macs2 callpeak -t ${file} -f BAM -g 1.87e9 --nomodel --shift 50 --extsize 100 -n ${output} --outdir ${outdir}
+macs2 callpeak -t ${file}.bam -f BAM -g 1.87e9 --nomodel --shift 50 --extsize 100 -n ${file}_summits.bed --outdir MACS2/Peaks
 
 # Motif enrichment analysis and peak annotation with HOMER from patterns identified by R DiffBind using filtered GTF from scRNA-seq analysis
-annotatePeaks.pl ${file} ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa -gtf ../Ref/refdata-cellranger-mm39/Mus_musculus.GRCm39.108.filtered.gtf > ${outdir}/${file}_annotated.txt
-findMotifsGenome.pl ${file} ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ${current_tag} -size 200 -len '8,10,12' -S 40
+annotatePeaks.pl ${file}.bed ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa -gtf ../Ref/refdata-cellranger-mm39/Mus_musculus.GRCm39.108.filtered.gtf > ${file}_annotated.txt
+findMotifsGenome.pl ${file}.bed ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ${outdir} -size 200 -len '8,10,12' -S 40
 ```
 
 
@@ -153,15 +153,21 @@ sh RSEM.sh PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
 ```bash
 # Trimming to remove adapters
 # For Batch 1 from GSE291075 and Batch 3 from GSE291076
-trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
+trimmomatic PE -threads 4 ${R1} ${R2} \
+Trimmed/Trimmomatic/Paired/${P1} Trimmed/Trimmomatic/Unpaired/${U1} \
+Trimmed/Trimmomatic/Paired/${P2} Trimmed/Trimmomatic/Unpaired/${U2} \
 ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:3 TRAILING:3 MINLEN:36 
 # For Batch 2 from GSE291075
-trimmomatic PE -threads 4 $R1 $R2 ${outdir}/Paired/${P1} ${outdir}/Unpaired/${U1} ${outdir}/Paired/${P2} ${outdir}/Unpaired/${U2} \
+trimmomatic PE -threads 4 ${R1} ${R2} \
+Trimmed/Trimmomatic/Paired/${P1} Trimmed/Trimmomatic/Unpaired/${U1} \
+Trimmed/Trimmomatic/Paired/${P2} Trimmed/Trimmomatic/Unpaired/${U2} \
 ILLUMINACLIP:../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:10 SLIDINGWINDOW:4:15 LEADING:5 TRAILING:3 MINLEN:36
 # For Batch 4 from GSE291316, no Trimming step was necessary
 
-# RSEM alignment 
-rsem-calculate-expression -p 8 --paired-end --star --star-gzipped-read-file $R1 $R2 ./Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
+# RSEM alignment for Batch 1-3 from GSE291075 and GSE291076
+rsem-calculate-expression -p 8 --paired-end --star --star-gzipped-read-file ${R1} ${R2} ../Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
+# RSEM alignment for Batch 4 from GSE291316
+rsem-calculate-expression -p 8 --star --star-gzipped-read-file ${file} ../Ref/refdata-RSEM-mm39.108/mm39.108 ${output}
 ```
 
 
@@ -213,8 +219,8 @@ sh 6_Annotate.sh -N '' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks .
 ### Using directly tools
 ```bash
 # Trimming to remove duplicated reads and adapters
-clumpify.sh in=${file} out=${output} dedupe=t subs=0
-trimmomatic SE -threads 4 ${file} ${output} SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 ../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7
+clumpify.sh in=${file}.fastq out=${file}_Clum.fastq dedupe=t subs=0
+trimmomatic SE -threads 4 ${file}_Clum.fastq ${output}_Clum_Trimmed.fastq SLIDINGWINDOW:4:15 LEADING:5 TRAILING:5 MINLEN:36 ../Ref/TruSeq3-SE_NexteraPE-PE.fa:2:30:7
 
 # Mapping using Bowtie2
 bowtie2-p 2 --end-to-end --very-sensitive --no-mixed --no-discordant -x ../Ref/refdata-Bowtie2-mm39/mm39 -U ${file} -S Mapped/mm39/SAM/${file}.sam
@@ -222,18 +228,18 @@ picard SortSam INPUT=Mapped/mm39/SAM/${file}.sam OUTPUT=Mapped/mm39/BAM/${file}_
 VALIDATION_STRINGENCY=LENIENT TMP_DIR=tmp SORT_ORDER=coordinate
 
 # Filtering
-samtools view -h ${file} | samtools view -b -Sq 10  > ${bam_filtered}
-samtools index ${bam_filtered} ${bai_filtered}
+samtools view -h ${file}.bam | samtools view -b -Sq 10  > ${bam}_filtered.bam
+samtools index ${bam}_filtered.bam ${bam}_filtered.bai
 
 # Peak calling with HOMER
 makeTagDirectory HOMER/Tags/${file}/mm39/BAM/${file}.bam -fragLength 50 -single 
 makeUCSCfile HOMER/Tags/${file} -o auto
-findPeaks HOMER/Tags/${file} -style factor -o HOMER/Peaks/${file}/${file}_peaks.txt -L 4 -C 2 -tagThreshold 2 -i HOMER/Tags/${input} -F 4 
-grep -v '^#' HOMER/Peaks/${file}/${file}_peaks.txt | awk -v OFS='	' '{print $2,$3,$4,$1,$8,$5}' | bedtools sort > HOMER/Peaks/${file}/${file}_peaks.bed 
+findPeaks HOMER/Tags/${file}.bam -style factor -o HOMER/Peaks/${file}/${file}_peaks.txt -L 4 -C 2 -tagThreshold 2 -i HOMER/Tags/${input_file}.bam -F 4
+grep -v '^#' HOMER/Peaks/${file}/${file}_peaks.txt | awk -v OFS='\t' '{print $2,$3,$4,$1,$8,$5}' | bedtools sort > HOMER/Peaks/${file}/${file}_peaks.bed 
 
 # Motif enrichment analysis and peak annotation with HOMER from patterns identified by R DiffBind using filtered GTF from scRNA-seq analysis
-annotatePeaks.pl ${file} ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa -gtf ../Ref/refdata-cellranger-mm39/Mus_musculus.GRCm39.108.filtered.gtf > ${outdir}/${file}_annotated.txt
-findMotifsGenome.pl ${file} ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ${current_tag} -size 200 -len '8,10,12' -S 40
+annotatePeaks.pl ${file}.bed ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa -gtf ../Ref/refdata-cellranger-mm39/Mus_musculus.GRCm39.108.filtered.gtf > ${file}_annotated.txt
+findMotifsGenome.pl ${file}.bed ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ${outdir} -size 200 -len '8,10,12' -S 40
 ```
 
 
