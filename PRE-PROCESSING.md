@@ -146,7 +146,7 @@ sh Trim.sh -S 4:15 -L 5 -T 3 -M 36 -I ../Ref/NexteraPE-PE_Clontech-TTT.fa:2:30:1
 sh QC.sh Trimmed/Trimmomatic/Paired
 
 # RSEM alignment
-sh RSEM.sh PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
+sh RSEM.sh -B false PE Trimmed/Trimmomatic/Paired ../Ref/refdata-RSEM-mm39.108/mm39.108
 ```
 
 ### Using directly tools
