@@ -1,7 +1,7 @@
 # DATA PRE-PROCESSING
 
 ## DESCRIPTION
-Before applying provided R scripts, Bulk RNA-seq and DNase-seq data were pre-processed using custom pipelines [**Workflow_RNA-seq**](https://github.com/JosephLeger/Workflow_RNA-seq) and [**Workflow_ChIP-like**](https://github.com/JosephLeger/Workflow_ChIP-like). Single cell RNA-seq data were pre-processed using **CellRanger**.
+Before applying provided R scripts, Bulk RNA-seq and DNase-seq data were pre-processed using custom pipelines [**Workflow_RNA-seq**](https://github.com/JosephLeger/Workflow_RNA-seq) release v1.0.1 and [**Workflow_ChIP-like**](https://github.com/JosephLeger/Workflow_ChIP-like). Single cell RNA-seq data were pre-processed using **CellRanger**.
 To reproduce the same pre-processing steps, we provided here the exact command lines used for these respective custom pipelines, or the equivalent command line syntax while using directly tools.  
 Mapping and annotation were realized using Ensembl [GRCm39](https://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz) and [GTF release 108](https://ftp.ensembl.org/pub/release-108/gtf/mus_musculus/Mus_musculus.GRCm39.108.gtf.gz).
 
