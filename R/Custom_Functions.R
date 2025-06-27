@@ -75,6 +75,113 @@ Quantile_Normalization <- function(df){
   return(as.data.frame(df_final))
 }
 
+#-------------------------------------------------------------------------------
+
+DrawHeatmap <- function(counts, sampleSheet, genes, 
+                        by.group = F, 
+                        groups = NA,
+                        logT = F,
+                        scale = 'row',
+                        cluster_cols = F, 
+                        cluster_rows = T,
+                        treeheight_row = 50,
+                        treeheight_col = 50,
+                        color = colorRampPalette(c("blue","white","red"))(50),
+                        border_color = NA,
+                        gaps_col = 0,
+                        gaps_row = 0,
+                        fontsize = 10,
+                        fontsize_row = fontsize,
+                        fontsize_col = fontsize,
+                        title = ''){
+  
+  # Draw a heatmap of gene expression from a table
+  #
+  # counts         = Table with gene expressions and names as Symbol column
+  # sampleSheet    = metadata containing a column called 'Group'
+  # genes          = gene names to draw
+  # by.group       = whether draw heatmap for average expression by Group
+  # groups         = groups to consider from sampleSheet$Group column
+  # logT           = whether log transform expression values
+  # scale          = 
+  # cluster_cols   =
+  # cluster_rows   =
+  # treeheight_row = 
+  # treeheight_col = 
+  # color          =
+  # border_color   =
+  # gaps_col       = 
+  # gaps_row       = 
+  # fontsize       =
+  # fontsize_row   =
+  # fontsize_col   =
+  # title          =
+  
+  suppressPackageStartupMessages(library(pheatmap))
+  
+  # Abort function if 'Group' column not found in sampleSheet
+  if('Group' %!in% colnames(sampleSheet)){
+    stop(paste0('Provided sampleSheet does not contain \'Group\' column. ',
+                'Please rename the column to consider to group samples.'))
+  }
+  
+  # Subset table - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+  # Subset sampleSheet based on defined or default groups
+  if(length(groups) == 1 & is.na(groups)){
+    groups        <- unique(sampleSheet$Group)
+  }
+  sampleSheet     <- sampleSheet[sampleSheet$Group %in% groups,]
+  
+  # Subset counts based on groups and expressed genes
+  y               <- counts[counts$Symbol %in% genes, 
+                            c('Symbol', sampleSheet$Sample)]
+  
+  # Remove zero expressed genes in the corresponding subset of samples
+  y               <- y[rowSums(y[,colnames(y) %!in% 'Symbol']) != 0,]
+  
+  # Calculate mean expression if required or just filter count table
+  if(by.group){
+    y.mean        <- list(Symbol = y$Symbol)
+    for(g in groups){
+      samples     <- sampleSheet$Sample[sampleSheet$Group %in% g]
+      y.sub       <- y[,colnames(y) %in% samples]
+      y.mean[[g]] <- rowSums(y.sub)/ncol(y.sub)
+    }
+    y <- data.frame(y.mean)
+    
+  }else{
+    samples       <- c()
+    for(g in groups){
+      samples     <- c(samples, sampleSheet$Sample[sampleSheet$Group %in% g])
+    }  
+    y             <- y[,c('Symbol', samples)]
+  }
+  
+  # Manage logT if required
+  if(logT){
+    y.log <- log(y[,colnames(y) %!in% 'Symbol']+1)
+    y     <- cbind(Symbol = y$Symbol, y.log)
+    scale <- 'none'
+  }
+  
+  # Draw Heatmap - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  plot <- pheatmap(y[,colnames(y) %!in% 'Symbol'],
+                   cluster_cols = cluster_cols, 
+                   cluster_rows = cluster_rows, 
+                   treeheight_row = treeheight_row,
+                   treeheight_col = treeheight_col,
+                   scale = scale,
+                   color = color,
+                   border_color = border_color,
+                   gaps_col = gaps_col,
+                   gaps_row = gaps_row,
+                   labels_row = y$Symbol, 
+                   fontsize = fontsize,
+                   fontsize_row = fontsize_row,
+                   fontsize_col = fontsize_col,
+                   main = title)
+}
+
 
 
 #===============================================================================
