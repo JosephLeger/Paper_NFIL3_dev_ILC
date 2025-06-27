@@ -420,7 +420,7 @@ for(i in 1:(ncol(FULL)-ncol(plus))){
 FULL <- rbind(FULL, plus)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save final normalize table with stats available in GEO
+# Save final normalized table with stats available in GEO
 write.table(FULL, paste0(PATH_SAVE, '/Table_Results.txt'), quote=F, sep='\t')
 FULL <- read.table(paste0(PATH_SAVE, 'Table_Results.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
