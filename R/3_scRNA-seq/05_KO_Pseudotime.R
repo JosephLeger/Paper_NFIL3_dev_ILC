@@ -23,7 +23,7 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
+PATH <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -32,7 +32,7 @@ PATH <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(slingshot))
@@ -50,7 +50,7 @@ CellTypeOrder     <- c('ALP', 'TULIP', 'ILCpro', 'overLIP', 'NF-KO', 'TOX-KO')
 
 
 #===============================================================================
-## SLINGSHOT : NF --------------------------------------------------------------
+## SLINGSHOT : WT & NF-KO ------------------------------------------------------
 #===============================================================================
 #Based on : https://bustools.github.io/BUS_notebooks_R/slingshot.html
 
@@ -108,7 +108,7 @@ curves <- slingCurves(sce, as.df = TRUE) %>%
 # First Trajectory
 plot12 <- FeaturePlot(NF, 'Slingshot_1', pt.size = 2, reduction = red) + 
   geom_path(data = curves %>% arrange(Order), aes(x, y, group = Lineage), 
-            size = 1.5) +
+            linewidth = 1.5) +
   labs(title = '', x = 'UMAP1', y = 'UMAP2', pt.size = 0.9) + 
   scale_color_gradientn(name = 'Pseudotime', colours = gradient) +
   xlim(xlimit) + ylim(ylimit) 
@@ -117,7 +117,7 @@ writePlot(plot12, PATH_FIG)
 # Second Trajectory
 plot13 <- FeaturePlot(NF, 'Slingshot_2', pt.size = 2, reduction = red) + 
   geom_path(data = curves %>% arrange(Order), aes(x, y, group = Lineage), 
-            size = 1.5) +
+            linewidth = 1.5) +
   labs(title = '', x = 'UMAP1', y = 'UMAP2', pt.size = 0.9) + 
   scale_color_gradientn(name = 'Pseudotime', colours = gradient) +
   xlim(xlimit) + ylim(ylimit) 
@@ -168,7 +168,7 @@ NF <- readRDS(paste0(PATH_SAVE, '/5_Pseudotime_NF.rds'))
 
 
 #===============================================================================
-## SLINGSHOT : ALL -------------------------------------------------------------
+## SLINGSHOT : WT & NF-KO & TOX-KO ---------------------------------------------
 #===============================================================================
 #Based on : https://bustools.github.io/BUS_notebooks_R/slingshot.html
 
@@ -182,6 +182,11 @@ ylimit <- c(min(ALL@reductions[[red]]@cell.embeddings[,2]),
 DimPlot(ALL, reduction = red, group.by = 'seurat_clusters', 
         label = TRUE, repel = TRUE, 
         cols = ColorBlind[c(3,9,2,7,8,10)], pt.size = 0.9) +
+  labs(title = '', x = 'UMAP1', y = 'UMAP2')
+
+DimPlot(ALL, group.by = "orig.ident", reduction = 'rev_umap_cssz2', 
+        cols = ColorBlind[c(11,11,11,3,6,8)], pt.size = 0.9, 
+        order = rev(CellTypeOrder)) +
   labs(title = '', x = 'UMAP1', y = 'UMAP2')
 
 
@@ -221,7 +226,7 @@ curves <- slingCurves(sce, as.df = TRUE) %>%
 # First Trajectory
 plot17 <- FeaturePlot(ALL, 'Slingshot_1', pt.size = 2, reduction = red) + 
   geom_path(data = curves %>% arrange(Order), aes(x, y, group = Lineage), 
-            size = 1.5) +
+            linewidth = 1.5) +
   labs(title = '', x = 'UMAP1', y = 'UMAP2', pt.size = 0.9) + 
   scale_color_gradientn(name = 'Pseudotime', colours = gradient) +
   xlim(xlimit) + ylim(ylimit) 
@@ -230,7 +235,7 @@ writePlot(plot17, PATH_FIG)
 # Second Trajectory
 plot18 <- FeaturePlot(ALL, 'Slingshot_2', pt.size = 2, reduction = red) + 
   geom_path(data = curves %>% arrange(Order), aes(x, y, group = Lineage), 
-            size = 1.5) +
+            linewidth = 1.5) +
   labs(title = '', x = 'UMAP1', y = 'UMAP2', pt.size = 0.9) + 
   scale_color_gradientn(name = 'Pseudotime', colours = gradient) +
   xlim(xlimit) + ylim(ylimit) 
@@ -282,7 +287,7 @@ ALL <- readRDS(paste0(PATH_SAVE, '/5_Pseudotime_ALL.rds'))
 
 
 #===============================================================================
-## GENE EXPRESSION VISUALIZATION : NF ------------------------------------------
+## GENE EXPRESSION VISUALIZATION : WT & NF-KO ----------------------------------
 #===============================================================================
 
 red <- 'rev_umap_cssz2'
@@ -308,24 +313,23 @@ table_NF   <- OrderMatrix(NF, 'Slingshot_1', min.cells = 50, slot = 'scaledata')
 
 # Draw gene expression across pseudotime - - - - - - - - - - - - - - - - - - - -
 DrawExpr(table_NF, bin.number = 11, by.order = F, feature = 'Nfil3', 
-         scale = F, std = F, ylim = c(-0.5,1.75), col = c("#26C4EC"), lwd = 3,
-         superposed = F, compare.with = F, write = T, 
-         dir = paste0(PATH_FIG, '/Curves'))
-
+         scale = T, std = F, ylim = c(-0.5,1.75), col = 'black', lwd = 2,
+         superposed = F)
 
 # Draw gene expression subsetted by sample - - - - - - - - - - - - - - - - - - -
 # Add Sample row 
 Sample <- c()
-Ann <- data.frame(Cell.ID = NF@assays[["RNA"]]@counts@Dimnames[[2]], Sample = NF@meta.data[["Sample"]])
-for(i in 1:ncol(table_NF)){
-  x <- ifelse(Ann$Sample[Ann$Cell.ID %in% colnames(table_NF)[i]] %in% 'NF-KO', 1, 0)
+Ann <- data.frame(Cell.ID = NF@assays[["RNA"]]@counts@Dimnames[[2]], 
+                  Sample = NF@meta.data[["Sample"]])
+for(i in 1:nrow(table_NF)){
+  x <- ifelse(Ann$Sample[Ann$Cell.ID %in% rownames(table_NF)[i]] %in% 'NF-KO', 'NF-KO', 'WT')
   Sample <- c(Sample, x)
 }
-table_NF <- rbind(Sample = as.vector(Sample),table_NF)
+table_NF <- cbind(Sample = as.vector(Sample),table_NF)
 
 gene = 'Nfil3'
 plot <- CompareExpr(x = table_NF, bin.number = 11, feature = gene, by.order = F, 
-                    scale = F, col = ColorBlind[c(11, 6)], main = gene, 
+                    scale = F, col = ColorBlind[c(8,3)], main = gene, 
                     ylim = c(-0.5,1.75))
 writePlot(plot, paste0(PATH_FIG, '/Curves'), filename = paste0('NF_', gene))
 
@@ -349,7 +353,6 @@ writePlot(plot23, PATH_FIG)
 table_ALL   <- OrderMatrix(overALL, 'Slingshot_2' ,min.cells = 50,  slot = 'scaledata')
 
 
-
 # Draw gene expression by sample - - - - - - - - - - - - - - - - - - - - - - - -
 # Add Sample row 
 Sample <- c()
@@ -370,10 +373,11 @@ genelist <- c('Id2', 'Itgb7', 'Gata3', 'Nfkb1', 'Pdcd1', 'Runx3', 'Sox5', 'Tcf7'
           'Zbtb16', 'Hoxa9', 'Irf8', 'Lmo2', 'Zeb2', 'Nfil3')
 
 for(gene in genelist){
-  plot <- CompareExpr(x = table_ALL , bin.number = 11, feature = gene, by.order = F, 
-                      scale = F, col = ColorBlind[c(6,8,3)], main = gene, ylim = c(-0.5,2.5))
+  CompareExpr(x = table_ALL , bin.number = 11, feature = gene, by.order = F, 
+              scale = T, col = ColorBlind[c(6,8,3)], main = gene, ylim = c(-0.5,2.5))
+  plot <- recordPlot()
   writePlot(plot, paste0(PATH_FIG, '/Curves'), filename = paste0('overALL_', gene),
             height = 8, width = 9 )
-}                                                                                           
+}
 
 
