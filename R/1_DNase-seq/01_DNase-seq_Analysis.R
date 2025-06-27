@@ -17,16 +17,26 @@
 
 rm(list=ls(all.names=TRUE))
 
-PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
-BAM_folder   <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/BAM'
-BED_folder   <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/Peaks/MACS2'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/DNAse-seq/SampleSheet_DNAse.csv'
+################################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+################################################################################
+
+PATH         <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
+BAM_folder   <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/DNAse-seq/BAM'
+BED_folder   <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/DNAse-seq/Peaks/MACS2'
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/DNAse-seq/SampleSheet_DNAse.csv'
+
+################################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+################################################################################
+
 setwd(PATH)
 
 # Load required packages and functions
-source('C:/Users/E15639P/Doctorat/Bulk_RNA-seq/Custom_functions.R')
+source('C:/Users/E15639P/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(DiffBind))
 suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(Hmisc))
 suppressPackageStartupMessages(library(stats))
 
 
@@ -73,9 +83,11 @@ data <- dba.count(data,
                   summits = 100, 
                   score = DBA_SCORE_RPKM)
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Saving dba.count object
 saveRDS(data, paste0(PATH_SAVE, '/data_DBAcount.RDS'))
-
+data <- readRDS(paste0(PATH_SAVE, '/data_DBAcount.RDS'))
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 plot(data)
 dev.print(png, file=paste0(PATH_FIG, '/data_1.png'), 
@@ -118,8 +130,12 @@ dba.plotPCA(data,
 dev.print(png, paste0(PATH_FIG, '/PCA_plot.png'),
           width = 9, height = 9, units = 'in', res = 100)
 
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Saving dba.analyze object
 saveRDS(data, paste0(PATH_SAVE, '/data_DBAanalyze.RDS'))
+data <- readRDS(paste0(PATH_SAVE, '/data_DBAanalyze.RDS'))
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 ## Full Table Preparation ------------------------------------------------------
@@ -137,11 +153,13 @@ for(i in 1:length(data$peaks)){
 
 Merged.bed <- cbind(TABLE[,1:4], rep(1, nrow(TABLE)), rep('+', nrow(TABLE)))
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Saving native TABLE object and all peaks in a bedfile
 write.table(TABLE, paste0(PATH_SAVE, '/Peaks_Table.txt'), 
             quote = F, row.names = F)
 write.table(Merged.bed, paste0(PATH_SAVE, "/Peaks/All_Overlap_Peaks.bed"),
             sep = "\t", quote = F, row.names = F, col.names = F)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 
@@ -159,7 +177,7 @@ for(i in 1:nrow(COMP)){
   # Volcano plot
   dba.plotVolcano(data, 
                   contrast = i)
-  
+          
   dev.print(png, paste(PATH_FIG, curr, 'VolcanoPlot.png', sep = '/'),
             width = 9, height = 9, units = 'in', res = 100)
   
@@ -171,6 +189,7 @@ for(i in 1:nrow(COMP)){
                bGain = TRUE, 
                bLoss = TRUE, 
                bAll=FALSE)
+          
   dev.print(png, paste(PATH_FIG, curr, 'VennDiagram.png', sep = '/'),
             width = 9, height = 9, units = 'in', res = 100)
 
@@ -233,16 +252,16 @@ for(i in 1:nrow(COMP)){
               paste0(PATH_SAVE, '/Peaks/', curr, '/', curr, '_loss.bed'), 
               quote = F, col.names = F, row.names = F, sep = "\t")
   write.table(data.DB.gain,
-                paste0(PATH_SAVE, '/Peaks/', curr, '/', curr, '_gain.bed'), 
+              paste0(PATH_SAVE, '/Peaks/', curr, '/', curr, '_gain.bed'), 
               quote = F, col.names = F, row.names = F, sep = "\t")
-  
 }
 
-
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Saving final TABLE object
 write.table(TABLE, paste0(PATH_SAVE, '/Peaks_Table_Contrasted.txt'), 
             quote = F, row.names = F)
- 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 ## Saving files for all non DB sites -------------------------------------------
 # Create new folder
@@ -258,10 +277,12 @@ non_DB.BED <- cbind(non_DB[,1:3],
                     score = rep(1, nrow(non_DB)),
                     strand = rep('+', nrow(non_DB)))
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save non DB BED file
 write.table(non_DB.BED, 
             paste0(PATH_SAVE, '/Peaks/non_DB/non_DB.bed'), 
             quote = F, row.names = F, col.names = F, sep = "\t")
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 
@@ -323,7 +344,6 @@ for(i in 1:length(patterns)){
                      names(patterns)[i], '.bed'), 
               quote = F, col.names = F, row.names = F, sep = "\t")
   print(paste(names(patterns)[i], ' : ', nrow(subset), ' peaks', sep = ''))
-  
 }
 
 
@@ -352,10 +372,12 @@ POI_merged.BED <- cbind(POI_merged[,1:3],
                         score = rep(1, nrow(POI_merged)),
                         strand = rep('+', nrow(POI_merged)))
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save ALP open BED file
 write.table(POI_merged.BED, 
             paste0(PATH_SAVE, '/Peaks/POI_merged/POI_merged_sorted.bed'), 
             quote = F, row.names = F, col.names = F, sep = "\t")
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 ## ALP open regions ------------------------------------------------------------
@@ -384,10 +406,12 @@ ALP_open.BED <- cbind(ALP_open[,1:3],
                       score = rep(1, nrow(ALP_open)),
                       strand = rep('+', nrow(ALP_open)))
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save ALP open BED file
 write.table(ALP_open.BED, 
             paste0(PATH_SAVE, '/Peaks/ALP_open/ALP_open_sorted.bed'), 
             quote = F, row.names = F, col.names = F, sep = "\t")
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 
@@ -400,17 +424,23 @@ write.table(ALP_open.BED,
 #===============================================================================
 ## TF MOTIFS IN OPEN CHROMATIN -------------------------------------------------
 #===============================================================================
+# Based on : Wingender et al., Nuclieic Acids Res. (2014)
+# https://pubmed.ncbi.nlm.nih.gov/25361979/
+# http://tfclass.bioinf.med.uni-goettingen.de/
+
 # Explore HOMER motif enrichment results
 # Here are written only the first member of top 5 TF families identified, and
 # then we add all members of its Subfamily
-# based on : http://www.edgar-wingender.de/muTF_classification-1.html
+
+
+
 TF_fam <- list()
 
 ## MOTIFS OF [-][+] PATTERN ----------------------------------------------------
 
 # 1) ETS1 (ETS)
 # 2) RUNX (Runt)
-# 3) AtGRF6 (GRF) /!\ plants
+# 3) AtGRF6 (GRF) /!\ vegetals
 # 4) CTCF (Zf)
 # 5) Ascl1 (bHLH)
 
@@ -487,7 +517,79 @@ TF_fam[["BZIP_large"]] <- c(
   "Utf1","Spib"
 )
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Saving R object containing family genes list
 saveRDS(TF_fam, paste0(PATH_SAVE, '/TF_fam.RDS'))
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+
+
+#===============================================================================
+## EXPLORE ANNOTATIONS PATTERNS ------------------------------------------------
+#===============================================================================
+# Updated on 26/02/2025
+
+folder   <- paste0(PATH_SAVE, '/Peaks')
+patterns <- c('[+][-]', '[+][0]', '[+][+]', '[-][+]', '[-][0]', '[-][-]', 
+              '[0][-]', '[0][+]', '[0][0]')
+
+All_Peaks <- data.frame()
+for(p in patterns){
+  # Read and format corresponding annotated peak table
+  Annotated <- read.table(
+    paste0(folder, '/', p, '/', p, '_NFIL3_Known_location.txt'), 
+    sep = '\t', header = T)
+  colnames(Annotated)[1]               <- 'Peak_ID'
+  colnames(Annotated)[ncol(Annotated)] <- 'Nfil3_Motif'
+  Annotated <- cbind(Annotated, Cluster = p)
+  All_Peaks <- rbind(All_Peaks, Annotated)
+  
+  # Set colors depending on legends length
+  if(p %in% '[-][+]'){
+    color_set <- c(2,7,8,9,10)
+  }else{
+    color_set <- c(3,2,7,8,9,10)
+  }
+  
+  # Draw PieChart
+  regions     <- capitalize(
+    unlist(lapply(strsplit(as.character(Annotated$Annotation), " \\("),"[[",1)))
+  
+  y           <- as.data.frame(table(regions))
+  colnames(y) <- c('Region', 'value')
+  plot <- ggplot(y, aes(x='', y=value, fill=Region)) +
+    geom_col(color='black') +
+    geom_text(aes(x = 1.6, label=value),
+              position=position_stack(vjust=0.5)) +
+    scale_fill_manual(values=ColorBlind[color_set]) +
+    coord_polar(theta = 'y') +
+    theme_void() + ggtitle(p)
+  print(plot)
+  
+  # Write PieChart
+  ggsave(paste0(PATH_FIG, '/PieChart_', p, '.jpg'), plot, 
+         width = 3000, height = 2500, units = "px")
+  
+  # Save corresponding gene list
+  genes <- unique(Annotated$Gene.Name)
+  genes <- genes[genes %!in% '']
+  write.table(genes, paste0(PATH_SAVE, '/Peaks/',f,'/GeneList_',f,'.txt'),
+              col.names = F, row.names = F, quote = F)
+}
+
+
+All_Peaks$Peak.Score <- 1
+Open_in_ALP <- (All_Peaks[grep("^.0..0|^.0..-|^.-", All_Peaks$Cluster),])
+Open_in_ALP_bed <- Open_in_ALP[,c(2,3,4,1)]
+
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# Save full peak tables
+write.table(All_Peaks, paste0(PATH_SAVE, '/Peaks/All_Peaks_Annotated.txt'),
+            sep = '\t', quote = F, row.names = F, col.names = T)
+
+write.table(Open_in_ALP_bed, paste0(PATH_SAVE, '/Peaks/Open_in_ALP.bed'),
+            sep = '\t', quote = F, row.names = F, col.names = T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
