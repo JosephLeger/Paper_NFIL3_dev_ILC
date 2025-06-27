@@ -24,7 +24,7 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
+PATH <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -33,7 +33,7 @@ PATH <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/NFIL3_dev_ILC/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(slingshot))
