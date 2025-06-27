@@ -2,14 +2,14 @@
 
 
 #===============================================================================
-# DESCRIPTION ------------------------------------------------------------------
+## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
 
 
 
 
 #===============================================================================
-# SETUP ------------------------------------------------------------------------
+## SETUP -----------------------------------------------------------------------
 #===============================================================================
 
 rm(list=ls(all.names=TRUE))
@@ -58,7 +58,7 @@ PATH_SAVE <- paste0(PATH, '/Saves/Bulk_RNA-seq/Tox')
 
 
 #===============================================================================
-# READING FILES ----------------------------------------------------------------
+## READING FILES ---------------------------------------------------------------
 #===============================================================================
 
 # Read metadata sample sheet and comparisons to make
@@ -71,14 +71,16 @@ TXI             <- tximport(paste(DATA_DIR, METADATA$FileName, sep = '/'),
 Table           <- as.data.frame(TXI$counts)
 colnames(Table) <- METADATA$SampleName
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save aggregated Table_Raw available in GEO
-write.table(Table, 
-            paste0(PATH_SAVE, '/Table_Raw.txt'), quote = F)
+write.table(Table, paste0(PATH_SAVE, '/Table_Raw.txt'), quote = F)
+Table <- read.table(paste0(PATH_SAVE, '/Table_Raw.txt'), header = T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 
 #===============================================================================
-# DATA DISTRIBUTION BEFORE NORMALIZATION  --------------------------------------
+## DATA DISTRIBUTION BEFORE NORMALIZATION  -------------------------------------
 #===============================================================================
 
 # Make heatmaps by celltype
@@ -135,7 +137,7 @@ dev.print(png, file=paste0(PATH_FIG, '/Dendro_Raw.png'),
 
 
 #===============================================================================
-# QUANTILE NORMALIZATION -------------------------------------------------------
+## QUANTILE NORMALIZATION ------------------------------------------------------
 #===============================================================================
 
 # Eliminate zero expressed genes
@@ -143,10 +145,11 @@ cutoff         <- 1
 eliminate      <- which(apply(cpm(Table), 1, max) < cutoff)
 Table_filtered <- Table[-eliminate,]
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save aggregated Table after non-expressed genes removal
-write.table(Table_filtered, 
-            paste0(PATH_SAVE, '/Table_Filtered.txt'), quote = F)
-
+write.table(Table_filtered, paste0(PATH_SAVE, '/Table_Filtered.txt'), quote = F)
+Table_filtered <- read.table(paste0(PATH_SAVE, '/Table_Filtered.txt'), header=T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Plot distribution before quantile-normalization
 Table_filtered %>% 
   gather(Sample, Count) %>% 
@@ -179,14 +182,15 @@ plot(hc, main = '', xlab = 'Samples', sub = '')
 dev.print(png, file=paste0(PATH_FIG, '/Dendro_Norm.png'), 
           width=9, height=9, units='in', res=100)
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save aggregated Table_Norm available in GEO
-write.table(Table_norm, 
-            paste0(PATH_SAVE, '/Table_Norm.txt'), quote = F)
-
+write.table(Table_norm, paste0(PATH_SAVE, '/Table_Norm.txt'), quote = F)
+Table_norm <- read.table(paste0(PATH_SAVE, '/Table_Norm.txt'), header = T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 #===============================================================================
-# GENE SYMBOL ANNOTATION -------------------------------------------------------
+## GENE SYMBOL ANNOTATION ------------------------------------------------------
 #===============================================================================
 
 ID     <- rownames(Table_norm)
@@ -194,26 +198,30 @@ mapped <- mapIds(org.Mm.eg.db,
                  keys = ID,
                  keytype = 'ENSEMBL', 
                  column = 'SYMBOL')
-Symbol <- c()
-for(j in 1:length(ID)){
-  if(!is.na(mapped[j])){
-    Symbol <- c(Symbol, mapped[j])
+mapped <- data.frame(ID = names(mapped), Symbol = mapped)
+
+# Define function to fill in faster than iteration
+fill_if_NA <- function(line){
+  if(is.na(line[2])){
+    return(line[1])
   }else{
-    Symbol <- c(Symbol, ID[j])
+    return(line[2])
   }
 }
-Table_annotated <- cbind(Table_norm, Symbol = Symbol)
-Table_annotated <- Table_annotated[,c(ncol(Table_annotated), 
-                                      1:(ncol(Table_annotated)-1))]
+Symbol           <-  apply(mapped, 1, fill_if_NA)
+Table_annotated  <- cbind(Symbol = Symbol, Table_norm)
+Table_annotated  <- Table_annotated[order(rownames(Table_annotated)),]
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save table with annotated gene symbol
-write.table(Table_annotated, 
-            paste0(PATH_SAVE, '/Table_Annotated.txt'), quote = F)
+write.table(Table_annotated, paste0(PATH_SAVE, '/Table_Annotated.txt'), quote=F)
+Table_annotated <- read.table(paste0(PATH_SAVE,'/Table_Annotated.txt'),header=T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
 
 #===============================================================================
-# FITTING MODEL ----------------------------------------------------------------
+## FITTING MODEL ---------------------------------------------------------------
 #===============================================================================
 
 # Create DGEList object
@@ -259,7 +267,7 @@ fit   <- lmFit(y, model)
 
 
 #===============================================================================
-# MAKE COMPARISONS -------------------------------------------------------------
+## MAKE COMPARISONS ------------------------------------------------------------
 #===============================================================================
 
 Results_list <- list()
@@ -343,10 +351,12 @@ for(i in 1:nrow(COMPARISONS)){
   UP   <- unique(result$Symbol[result$keyvals == "red"])
   DOWN <- unique(result$Symbol[result$keyvals == "royalblue"])
   
+  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
   write.table(UP, paste0(PATH_SAVE, '/', title, '_UP.txt'), 
               row.names = F, col.names = F, quote = F)
   write.table(DOWN, paste0(PATH_SAVE, '/', title, '_DOWN.txt'),
               row.names = F, col.names = F, quote = F)
+  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 }
 
 
@@ -359,7 +369,7 @@ easyVolcano(result, x='logFC', y='P.Value', fccut = 1,
 
 
 #===============================================================================
-# FINAL TABLE RESULT -----------------------------------------------------------
+## FINAL TABLE RESULT ----------------------------------------------------------
 #===============================================================================
 # Generate full table annotated with expression and stats
 FULL <- read.table(paste0(PATH_SAVE, '/Table_Annotated.txt'), header = T)
@@ -401,11 +411,10 @@ for(i in 1:(ncol(FULL)-ncol(plus))){
 }
 FULL <- rbind(FULL, plus)
 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save final table
-write.table(FULL, paste0(PATH_SAVE, '/Table_Results.txt'), 
-            quote = F, sep = '\t')
-
-
-
+write.table(FULL, paste0(PATH_SAVE, '/Table_Results.txt'), quote=F, sep='\t')
+FULL <- read.table(paste0(PATH_SAVE, 'Table_Results.txt'), header = T)
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 
 
