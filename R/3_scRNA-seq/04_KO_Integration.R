@@ -443,7 +443,7 @@ data <- readRDS(paste0(PATH_SAVE, '/4_Filtered_ALL.rds'))
 ## DC SCORING ------------------------------------------------------------------
 
 # Loading a subset of DC and pre-DC markers
-DC_table <- read.csv('C:/Users/E15639P/Data/Lists/DC_enrichement_list.csv', 
+DC_table <- read.csv('C:/Users/E15639P/Data/Lists/DC_enrichement_list.txt', 
                      header = TRUE, sep = ';', row.names = 1)
 DC_genelist <- list(row.names(DC_table[(DC_table$p_val < 0.01 & 
                                           DC_table$avg_logFC > 0.4),]))
