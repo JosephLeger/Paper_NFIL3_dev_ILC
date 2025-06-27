@@ -501,9 +501,9 @@ Candidates.DOWN <- Genelist[['NFIL3_vs_GFP_DOWN']][
   Genelist[['NFIL3_vs_GFP_DOWN']] %in% Genelist[['NFIL3_vs_ALP_DOWN']]]
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-write.table(Candidates.UP, paste0(PATH_SAVE, '/Candidates_UP.txt'), 
+write.table(Candidates.UP, paste0(PATH_SAVE, '/Bulk_Candidates_UP.txt'), 
             row.names = F, col.names = F, quote = F)
-write.table(Candidates.DOWN, paste0(PATH_SAVE, '/Candidates_DOWN.txt'), 
+write.table(Candidates.DOWN, paste0(PATH_SAVE, '/Bulk_Candidates_DOWN.txt'), 
             row.names = F, col.names = F, quote = F)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
