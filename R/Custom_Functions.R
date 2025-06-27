@@ -15,11 +15,6 @@
 `%!in%` <- Negate(`%in%`)
 
 # Colorblind friendly pack
-ColorBlind12 <- c('#016BA0', '#CA5100', '#5F9ED1', '#FF9933', '#A1C8EB', 
-                  '#F0E442', '#FFBBAB', '#555555', '#809099', '#CFCFCF', 
-                  '#3399FF', '#330066')
-
-# Custom 
 Blues <- c('#016BA0', '#5F9ED1', '#A1C8EB', '#3399FF',  '#006ddb', '#330066')
 YReds <- c('#FF0000', '#FF9933', '#F0E442', '#ffff6d', '#FF7070')
 Greys <- c('#131313','#555555', '#809099', '#CFCFCF', '#F2F4F4')
@@ -45,7 +40,7 @@ writePlot <- function(plot, path, filename=F, width=9, height=9, res=100){
   # height   = height of saved plot (inches)
   # res      = resolution to save
   
-    if(filename == F){
+  if(filename == F){
     file <- paste0(path, '/', deparse(substitute(plot)), '.png')
   }else{
     file <- paste0(path, '/', filename, '.png')
@@ -133,7 +128,7 @@ OrderMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay,
   return(matrix_leap)
 }
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 
 CalculateBin <- function(x, bin.number){
   
@@ -159,7 +154,7 @@ CalculateBin <- function(x, bin.number){
   return(result)
 }
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 
 PseudotimeRepartition <- function(x, bin.number = 21, bin.level = NULL){
   
@@ -199,7 +194,7 @@ PseudotimeRepartition <- function(x, bin.number = 21, bin.level = NULL){
   return(x)
 }
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 
 LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay, 
                        slot = 'data', write = FALSE, dir = getwd(), 
@@ -243,7 +238,7 @@ LeapMatrix <- function(x, trajectory, min.cells = 0, assay = x@active.assay,
   return(result)
 }
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 
 AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(), 
                          filename = 'results_indexed'){
@@ -277,318 +272,266 @@ AnnotateLeap <- function(MAC, index, write = FALSE, dir = getwd(),
   return(merged)
 }
 
-#------------------------------------------------------------------------------#
+
+
+#===============================================================================
+# PSEUDOTIME PLOTS -------------------------------------------------------------
+#===============================================================================
 
 DrawExpr <- function(x, bin.number = 21, feature.list, 
-                     by.order = F, std = F, scale = F, scale.method = 0,
-                     superposed = F, compare.with = F, write = F, dir = getwd(), 
-                     col = "black", lwd = 2, ylim = c(-0.75, 2), 
-                     xlab = "Pseudotime", ylab = "", main = "Untitled", 
-                     width = 900, height = 800){
+                     by.order = F, std = F, scale = F, superposed = F, 
+                     centroid = F, color = ColorBlind, lwd = 2, 
+                     ylim = c(-0.75, 2), xlab = 'Pseudotime', 
+                     ylab = 'Expression', main = NA){
   
-  # Faster way to plot multiple expression curves or superposed curves
+  # Draw single or multiple curves to show expression from ordered matrix
   #
   # x            = ordered matrix 
   # bin.number   = number of bin for representation
-  # feature_list = features to draw
+  # feature.list = features to draw
   # by.order     = if TRUE, consider cell order and not pseudotime to make bins
   # std          = whether draw std in plot (only for superposed = FALSE)
-  # scale        = whether scale shwon expression levels from 0 to 1
-  # scale.method = 0 : absolute [0,1] / 1 : MinMax / 2 : amplitude
+  # scale        = whether scale shown expression levels from 0 to 1
   # superposed   = whether draw all features superposed in a single plot
-  # write        = whether save resulting plots
-  # dir          = output directory to save plots
-  # col          = colors for plots (several can be specified for superposed)
+  # centroid     = whether draw centroid curve (superposed must be True)
+  # color        = colors for plots (several can be specified for superposed)
+  # lwd          = line thickness
   # ylim         = ylim for plots (can be manually adjusted)
   # xlab         = label on x axis for plots (default = "Pseudotime")
-  # ylab         = label on y axis for plots (default = "")
+  # ylab         = label on y axis for plots (default = "Expression")
   # main         = specified title for superposed plot
-  # width        = width of png file if saving plot
-  # height       = height of png file if saving plot
   
   suppressPackageStartupMessages(library(dplyr))
+  suppressPackageStartupMessages(library(ggplot2))
   
   # If x axis is setted to be cell ordered by rank and not by pseudotime value
   if(by.order){
     x$Pseudotime <- 1:nrow(x)
   }
   
-  # Subset table for more efficiency during following steps
-  x <- x[,colnames(x) %in% c('Pseudotime', feature.list)]
+  # Select only existing genes
+  absent_genes <- feature.list[feature.list %!in% colnames(x)]
+  feature.list <- feature.list[feature.list %in% colnames(x)]
+  if(length(absent_genes) != 0){
+    warning(paste0('Following genes not found in provided matrix :', 
+                   paste(absent_genes, collapse = ', ')))
+  }
   
+  # Subset table for more efficiency during following steps and order it
+  x <- x[,colnames(x) %in% c('Pseudotime', feature.list)]
+  x <- x[,order(match(colnames(x), c('Pseudotime', feature.list))), 
+         drop = FALSE]
   
   # Attributes Bin to each cell
   x <- PseudotimeRepartition(x, bin.number)
   
   # Initiate loop
-  x.dim         <- as.numeric(names(table(x$Bin)))
+  x.dim         <- as.numeric(unique(x$Bin))
   expr_table    <- data.frame()
-  stdup_table   <- data.frame()
-  stddown_table <- data.frame()
-  absent_genes  <- c()
-  
-  # Generate new_table containing bin mean expression for each provided gene
+
+  # Generate expr_table containing gene, bin, mean expr, std - - - - - - - - - -
   for(feature in feature.list){
-    # Reset vectors for current feature
-    mean.expr       <- c()
-    stdup           <- c()
-    stddown         <- c()
-    if(feature %in% colnames(x)){
+    for(b in x.dim){
+      # Subset Bin
+      values     <- x[x$Bin %in% b, feature]
+      expr_table <- rbind(expr_table, c(feature, b, mean(values), sd(values)))
+    }
+    colnames(expr_table) <- c('Gene', 'Bin', 'Expr', 'Std')
+    expr_table$Gene <- factor(expr_table$Gene, levels = feature.list)
+    
+    # Scale current gene mean expression if required - - - - - - - - - - - - -
+    if(scale){
+      scaled_expr <- as.numeric(expr_table$Expr[expr_table$Gene %in% feature])
+      scaled_expr <- (scaled_expr-min(scaled_expr))/
+        (max(scaled_expr)-min(scaled_expr))
+      expr_table$Expr[expr_table$Gene %in% feature] <- scaled_expr
+      # Modify parameters to correspond correctly to scaled plot
+      ylim        <- c(0,1)
+      std         <- F
+    }
+    
+    # Draw individual curves if not superposed - - - - - - - - - - - - - - - -
+    if(!superposed){
+      p <- ggplot(expr_table[expr_table$Gene %in% feature,], 
+                  aes(x = as.numeric(Bin), group = Gene)) +
+        geom_line(linewidth = lwd, aes(y = as.numeric(Expr), color = Gene)) +
+        scale_color_manual(values = color) +
+        theme_classic() +
+        ylim(ylim) 
+      if(std){
+        p <- p + geom_ribbon(
+          aes(y = as.numeric(Expr), ymin = as.numeric(Expr) - as.numeric(Std), 
+              ymax = as.numeric(Expr) + as.numeric(Std), fill = Gene), 
+          alpha = 0.1,) + scale_fill_manual(values = color)
+      }
+      p <- p + labs(x=xlab, y=ylab, title=ifelse(is.na(main), feature, main))
+      print(p)
+    }
+  }
+  
+  # Draw merged plot if required - - - - - - - - - - - - - - - - - - - - - - - - 
+  if(superposed){
+    p <- ggplot(expr_table, 
+                aes(x = as.numeric(Bin), group = Gene)) +
+      geom_line(linewidth = lwd, aes(y = as.numeric(Expr), color = Gene)) +
+      scale_color_manual(values = color) +
+      theme_classic() +
+      ylim(ylim) 
+    if(std){
+      p <- p + geom_ribbon(aes(y = as.numeric(Expr), 
+                               ymin = as.numeric(Expr) - as.numeric(Std), 
+                               ymax = as.numeric(Expr) + as.numeric(Std),
+                               fill = Gene), alpha = 0.1,) +
+        scale_fill_manual(values = color)
+    }
+    if(centroid){
+      centroid <- data.frame()
       for(b in x.dim){
-        # Subset Bin
-        values      <- x[,feature][as.character(x$Bin) == as.character(b)]
-        # Scaling data if method 1 is precised
-        if(scale & scale.method %in% 1){
-          values <- (values-min(values))/(max(values)-min(values))
-          values <- values %>% replace(is.na(.), 0)
-          ylim      <- c(0,1)
-        }
-        
-        # Calculate vectors
-        mean.expr   <- c(mean.expr, mean(values))
-        stdup       <- c(stdup, mean(values)+sd(values))
-        stddown     <- c(stddown, mean(values)-sd(values))
+        centroid <- rbind(
+          centroid, c('centroid', b, 
+                      mean(as.numeric(expr_table$Expr[expr_table$Bin %in% b]))))
       }
-      
-      # Scaling resulting means if scale method 0 is precised (default)
-      if(scale & scale.method %in% 0){
-        mean.expr <- (mean.expr-min(mean.expr))/(max(mean.expr)-min(mean.expr))
-        mean.expr <- mean.expr %>% replace(is.na(.), 0)
-        ylim      <- c(0,1)
-      }else if(scale & scale.method %in% 2){
-        mean.expr <- mean.expr/(abs(max(mean.expr))+abs(min(mean.expr)))
-        mean.expr <- mean.expr %>% replace(is.na(.), 0)
-        ylim      <- c(-1,1)
-      }
-      
-      # Complete tables with current vectors
-      expr_table    <- rbind(expr_table, c(feature, mean.expr))
-      stdup_table   <- rbind(stdup_table, c(feature, stdup))
-      stddown_table <- rbind(stddown_table, c(feature, stddown))
-    }else{
-      absent_genes <- c(absent_genes, feature)
+      colnames(centroid) <- c('Gene', 'Bin', 'Expr')
+      p <- p + geom_line(data = centroid, linewidth = lwd,
+                         aes(x = as.numeric(Bin), y = as.numeric(Expr)))
     }
+    p <- p + labs(x=xlab, y=ylab, title=ifelse(is.na(main), '', main))
+    print(p)
   }
-  
-  # Formation final new_table
-  rownames(expr_table)    <- expr_table[,1]
-  rownames(stdup_table)   <- stdup_table[,1]
-  rownames(stddown_table) <- stddown_table[,1]
-  expr_table              <- expr_table[,2:ncol(expr_table)]
-  stdup_table             <- stdup_table[,2:ncol(stdup_table)]
-  stddown_table           <- stddown_table[,2:ncol(stddown_table)]
-  colnames(expr_table)    <- x.dim
-  colnames(stdup_table)   <- x.dim
-  colnames(stddown_table) <- x.dim
-  
-  # Define function to select colors if multiple curves are drawn
-  choose_color <- function(defcol, n){
-    if(length(defcol) == 1){
-      return(defcol)
-    }else{
-      if(n <= length(defcol)){
-        return(defcol[n])
-      }else{
-        return("lightgrey")
-      }
-    }
-  }
-  
-  # Plotting depending on selected options
-  if(write == FALSE){
-    if(superposed == FALSE && compare.with == FALSE){
-      for(feature in rownames(expr_table)){
-        # Draw expression plot anyway
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = col[1], xlab = xlab, ylab = ylab, main = feature)
-        if(std == TRUE){
-          # Calculate and draw STD surfaces
-          par(new=TRUE)
-          x.surface <- c(x.dim, rev(x.dim))
-          y.surface <- c(stdup_table[feature,], rev(stddown_table[feature,]))
-          polygon(x.surface, y.surface, col = "#e9e9e9", border = NA)
-          par(new=TRUE)
-          # Draw expression curve again (upper than std surfaces)
-          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-               col = col[1], xlab = xlab, ylab = ylab, main = feature)
-          par(new=FALSE)
-        }
-      }
-    }else if(superposed == TRUE && compare.with == FALSE){
-      n <- 1
-      for(feature in rownames(expr_table)){
-        # Draw all expression plot
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = choose_color(col, n), xlab = xlab, ylab = ylab, main = main)
-        par(new=TRUE)
-        n <- n+1
-      }
-      par(new=FALSE)
-    }else if(compare.with != FALSE){
-      for(feature in rownames(expr_table)){
-        n <- 1
-        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, 
-             ylim = ylim, col = choose_color(col, n),  xlab = xlab, ylab = ylab, 
-             main = "")
-        par(new=TRUE)
-        n <- n+1
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = choose_color(col, n), xlab = xlab, ylab = ylab,
-             main = feature)
-        par(new=FALSE)
-      }
-    }
-  }else if(write == TRUE){
-    if(superposed == FALSE && compare.with == FALSE){
-      for(feature in rownames(expr_table)){
-        png(paste(dir, "/", feature, ".png", sep = ""), width = width, 
-            height = height)
-        # Draw expression plot anyway
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = col[1], xlab = xlab, ylab = ylab, main = feature)
-        if(std == TRUE){
-          # Calculate and draw STD surfaces
-          par(new=TRUE)
-          x.surface <- c(x.dim, rev(x.dim))
-          y.surface <- c(stdup_table[feature,], rev(stddown_table[feature,]))
-          polygon(x.surface, y.surface, col = "#e9e9e9", border = NA)
-          par(new=TRUE)
-          # Draw expression curve again (upper than std surfaces)
-          plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-               col = col[1], xlab = xlab, ylab = ylab, main = feature)
-          par(new=FALSE)
-        }
-        dev.off()
-      }
-    }else if(superposed == TRUE && compare.with == FALSE){
-      n <- 1
-      png(paste(dir, "/", main, ".png", sep = ""),width = 900, height = 800)
-      for(feature in rownames(expr_table)){
-        # Draw all expression plot
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = choose_color(col, n), xlab = xlab, ylab = ylab, main = main)
-        par(new=TRUE)
-        n <- n+1
-      }
-      par(new=FALSE)
-      dev.off()
-    }else if(compare.with != FALSE){
-      for(feature in rownames(expr_table)){
-        n <- 1
-        png(paste(dir, "/", feature, ".png", sep = ""), width = width, 
-            height = height)
-        plot(x.dim, expr_table[compare.with,], type = "l", lwd = lwd, 
-             ylim = ylim, col = choose_color(col, n), xlab = xlab, ylab = ylab, 
-             main = "")
-        par(new=TRUE)
-        n <- n+1
-        plot(x.dim, expr_table[feature,], type = "l", lwd = lwd, ylim = ylim, 
-             col = choose_color(col, n), xlab = xlab, ylab = ylab, 
-             main = feature)
-        par(new=FALSE)
-        dev.off()
-      }
-    }  
-  }    
   return(expr_table)
-}     
+}
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
 
-CompareExpr <- function(x, bin.number = 21, feature = 'Nfil3', by.order = F,
-                        scale = T, col = "black", lwd = 2, ylim = c(-0.75, 2), 
-                        xlab = "Pseudotime", ylab = "", main = ''){
+CompareExpr <- function(x, bin.number = 11, feature, 
+                        by.order = F, scale = T, min.cells = 5, stat = 't', 
+                        color = c("royalblue","red3"), lwd = 2, ylim = NULL, 
+                        xlab = 'Pseudotime', ylab = 'Expression', 
+                        main = feature, show = T){
   
-  # Draw feature expression by separating provided celltypes along pseudotime
+  # Compare feature expression between samples along one pseudotime trajectory
   #
-  # x            = ordered matrix with celltypes described in "Sample" row
-  # bin.number   = number of bin for representation
-  # feature      = feature to draw
-  # by.order     = if TRUE, consider cell order and not pseudotime to make bins
-  # scale        = whether scale shwon expression levels from 0 to 1
-  # col          = colors for plots (several can be specified)
-  # ylim         = ylim for plots (can be manually adjusted)
-  # xlab         = label on x axis for plots (default = "Pseudotime")
-  # ylab         = label on y axis for plots (default = "")
-  # main         = specified title oplot
+  # x          = ordered matrix 
+  # bin.number = number of bin for representation
+  # feature    = feature to draw
+  # by.order   = if TRUE, consider cell order and not pseudotime to make bins
+  # scale      = whether scale shown expression levels from 0 to 1
+  # min.cells  = minimal number of cells to consider valid bin to plot mean
+  # stat       = statistical test used, could be w (Wilcox) or t (Student T)
+  # color      = colors for plots (several can be specified for superposed)
+  # lwd        = line thickness
+  # ylim       = ylim for plots (can be manually adjusted)
+  # xlab       = label on x axis for plots (default = "Pseudotime")
+  # ylab       = label on y axis for plots (default = "Expression")
+  # main       = specified title for superposed plot
+  # show       = whether show the produced plot (use false to avoid memory use)
   
+  suppressPackageStartupMessages(library(ggplot2))
   
-  # Get sample names by default
-  sample.names <- names(table(as.character(as.vector(x$Sample))))
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+  get_significance <- function(p) {
+    if(is.na(p)){return(NA)
+    }else if(p < 0.0001){return('****')
+    }else if(p < 0.001){return('***')
+    }else if(p < 0.01){return('**')
+    }else if(p < 0.05){return('*')
+    }else{return(' ')}
+  }
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   
-  # If x axis is setted to be cell ordered by rank and not by pseudotime value
-  if(by.order){
-    x <- x[,colnames(x) %!in% 'Pseudotime']
-    x <- cbind(c(1:nrow(x)), x)
-    colnames(x) <- c('Pseudotime', colnames(x)[2:ncol(x)])
+  # If feature is not present in the table, stop immediatly the process
+  if(feature %!in% colnames(x)){
+    stop(paste(feature, 'not found as a feature column in the provided matrix'))
+  }
+  
+  # If x axis is set by cell rank and not by pseudotime value
+  if (by.order) {
+    x           <- x[rownames(x) %!in% 'Pseudotime',]
+    x           <- rbind(c(1:ncol(x)), x)
+    rownames(x) <- c('Pseudotime', rownames(x)[2:nrow(x)])
   }
   
   # Attribute Bin to each cell
-  x <- PseudotimeRepartition(x, bin.number)
+  x             <- PseudotimeRepartition(x, bin.number)
   
-  # Initiate loop
-  x.dim         <- as.numeric(names(table(x$Bin)))
-  expr_table    <- data.frame()
+  # Initiate loop with result_table and a list to store values by samples
+  result_table  <- data.frame()
+  expr_list     <- list()
   
-  
-  if(feature %in% colnames(x)){
-    # For each celltype it creates a new mean binned vector
-    for(s in sample.names){
-      subx          <- x[x$Sample %in% s, c('Bin', feature)]
-      mean.expr     <- c()
-      NA.list       <- c()
-      for(b in x.dim){
-        # Remove current point if number of values < 5
-        values      <- as.numeric(subx[,feature][
-          as.character(subx$Bin) %in% as.character(b)])
-        if(length(values) > 5){
-          mean.expr <- c(mean.expr, mean(values))
-        }else{
-          mean.expr <- c(mean.expr, NA)
-        }
+  # Loop over each unique bin value
+  for(b in unique(x$Bin)){
+    bin_means <- c()
+    bin_stats <- c()
+    
+    # Loop over each sample to get values for current bin and calculate means
+    for(s in unique(x$Sample)){
+      expr_list[[s]] <- x[feature][x$Bin %in% b & x$Sample %in% s,]
+      # Only consider groups above a defined cellnumber threshold (5 cells)
+      if(length(expr_list[[s]]) >= min.cells){
+        bin_means    <- c(bin_means, mean(expr_list[[s]]))
+      }else{
+        bin_means    <- c(bin_means, NA)
       }
-      # Complete tables with current vectors
-      expr_table    <- rbind(expr_table, c(s, mean.expr))
     }
+    names(bin_means) <- unique(x$Sample)
     
-    # Formating final table
-    res_table <- as.data.frame(sapply(
-      expr_table[,2:ncol(expr_table)],as.numeric))
-    
-    # If scale is precised
-    if(scale){
-      res_table <- (res_table-min(res_table, na.rm = T))/
-        (max(res_table, na.rm = T)-min(res_table, na.rm = T))
-      ylim      <- c(0,1)
+    # Loop over all possible comparisions to perform statistical test
+    for(i in 1:(length(expr_list)-1)){
+      for(j in (i+1):length(expr_list)){
+        
+        # Only consider groups above a defined cellnumber threshold (5 cells)
+        if(length(expr_list[[i]]) >= min.cells & 
+           length(expr_list[[j]]) >= min.cells) {
+          if (stat %in% 'w') {
+            test_result <- wilcox.test(expr_list[[i]], expr_list[[j]])
+          }else if(stat %in% 't'){
+            test_result <- t.test(expr_list[[i]], expr_list[[j]])
+          }
+          bin_stats     <- c(bin_stats, test_result$p.value)
+        }else{
+          bin_stats     <- c(bin_stats, NA)
+        }
+        names(bin_stats)[length(bin_stats)] <- paste0(
+          names(expr_list)[i], '_vs_', names(expr_list)[j])
+      }
     }
-    
-    rownames(res_table)    <- expr_table[,1]
-    colnames(res_table)    <- x.dim
-    res_table              <- res_table[,order(x.dim)]
-    
-    ### DRAW
-    
-    n <- 1
-    # Add extra space to right of plot area; change clipping to figure
-    par(mar=c(5,4,2,7))
-    for(s in rownames(res_table)){
-      # Draw all expression plot
-      plot(x.dim, as.numeric(res_table[s,]), type = "l", lwd = lwd, ylim = ylim, 
-           xlim=c(min(x$Pseudotime), max(x$Pseudotime)), col = col[n],  
-           xlab = xlab, ylab = ylab, main = main)
-      par(new=TRUE)
-      n <- n+1
-    }
-    legend(x="topleft", inset=c(1,0), xpd=T, bty="n", legend = sample.names, 
-           col = col, lwd = lwd, text.font = 0.5)
-    par(new=F)
-  }else{
-    warnings(paste(feature, 'gene not found.' ))
+    result_table           <- rbind(result_table, c(b, bin_means, bin_stats))
+    colnames(result_table) <- c('Bin', names(bin_means), names(bin_stats))
   }
+  
+  # Replace mean expression by scaled ones if required
+  if(scale){
+    scaled <- result_table[,2:(length(expr_list)+1)]
+    scaled <- (scaled-min(scaled, na.rm = T))/
+      (max(scaled, na.rm = T)-min(scaled, na.rm = T))
+    result_table[,2:(length(expr_list)+1)] <- scaled
+  }
+  
+  # Define ylim if not already done
+  if(length(ylim) %in% 0){
+    ylim   <- c(min(result_table[,2:(length(expr_list)+1)], na.rm = T),
+                max(result_table[,2:(length(expr_list)+1)], na.rm = T))
+  }
+  
+  # Plot results - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  gg_results <- data.frame(
+    Bin        = rep(result_table$Bin, length(expr_list)),
+    Expression = stack(result_table[,2:(length(expr_list)+1)])[,1],
+    Group      = stack(result_table[,2:(length(expr_list)+1)])[,2])
+  
+  p <- ggplot(gg_results, aes(x = Bin, y = Expression, color = Group)) +
+    geom_line(linewidth = lwd) +
+    scale_color_manual(values = color) + 
+    theme_classic() +
+    ylim(ylim) + labs(x = xlab, y = ylab, title = main)
+  
+  if(show){print(p)}
+  
+  return(result_table)
 }
 
 
-
+  
 #===============================================================================
 # ANNOTATION -------------------------------------------------------------------
 #===============================================================================
@@ -651,4 +594,4 @@ EnsemblToGeneSymbol <- function(x, refindex, duplicate = T, sum.duplicate = T){
   return(y)
 }  
 
-#------------------------------------------------------------------------------#
+#-------------------------------------------------------------------------------
