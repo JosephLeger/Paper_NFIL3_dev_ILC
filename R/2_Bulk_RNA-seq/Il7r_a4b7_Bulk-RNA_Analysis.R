@@ -361,12 +361,12 @@ for(i in 1:nrow(COMPARISONS)){
   UP   <- unique(result$Symbol[result$keyvals == "red"])
   DOWN <- unique(result$Symbol[result$keyvals == "royalblue"])
 
-  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
   write.table(UP, paste0(PATH_SAVE, '/', title, '_UP.txt'), 
               row.names = F, col.names = F, quote = F)
   write.table(DOWN, paste0(PATH_SAVE, '/', title, '_DOWN.txt'),
               row.names = F, col.names = F, quote = F)
-  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+  # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
 }
 
 
