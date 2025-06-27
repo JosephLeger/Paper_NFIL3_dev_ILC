@@ -101,7 +101,7 @@ Annotate    <- AnnotateLeap(MAC_results, gene_index, write = T,
                             filename = 'results_indexed')
 
 # Apply correlation cutoff defined by permutation
-perm_cutoff <- 0.25
+perm_cutoff <- 0.1675
 Annotate    <- Annotate[abs(Annotate$Correlation) > perm_cutoff,]
 
 
