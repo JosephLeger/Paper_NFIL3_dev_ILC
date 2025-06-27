@@ -119,15 +119,17 @@ Annotate <- read.table(paste0(PATH_SAVE, '/LEAP/results_indexed_filtered.txt'),
 ## LEAP RESULTS ANALYSIS -------------------------------------------------------
 #===============================================================================
 
-table    <- OrderMatrix(data, 'Slingshot_1', min.cells = 50, slot = 'scaledata')
-NF       <- Annotate[Annotate$gene_row %in% 'Nfil3' & Annotate$Lag > 0,]
-
+NF      <- Annotate[Annotate$gene_row %in% 'Nfil3' & Annotate$Lag > 0,]
+NF_UP   <- NF$gene_col[NF$Correlation > 0]
+NF_DOWN <- NF$gene_col[NF$Correlation < 0]
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save table and candidates
-write.table(NF, paste0(PATH_SAVE, '/LEAP/TABLE_Nfil3_Candidates.txt'), 
+write.table(NF, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_2.txt'), 
             quote = F, row.names = F, col.names = T)
-write.table(NF$gene_col, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_2.txt'), 
+write.table(NF_UP, paste0(PATH_SAVE, '/LEAP/LEAP_Candidates_UP.txt'), 
+            quote = F, row.names = F, col.names = F)
+write.table(NF_DOWN, paste0(PATH_SAVE, '/LEAP/LEAP_Candidates_DOWN.txt'), 
             quote = F, row.names = F, col.names = F)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
