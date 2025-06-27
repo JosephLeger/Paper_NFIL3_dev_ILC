@@ -21,7 +21,7 @@
 
 
 #===============================================================================
-## SETUP -----------------------------------------------------------------------
+## SET UP ----------------------------------------------------------------------
 #===============================================================================
 
 rm(list=ls(all.names=TRUE))
@@ -40,7 +40,7 @@ DATA_DIR     <- 'C:/Users/E15639P/Data/scRNA-seq/SingleCell_mm39'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_Functions.R')
+source('C:/Users/E15639P/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyverse))
@@ -88,7 +88,7 @@ TULIP     <- Read10X(
   CreateSeuratObject(project = 'TULIP', min.cells = 1, min.features = 0)
 
 # Recent Experiment - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Il7rLT+ XT
+# Il7rLT+ WT
 overLIP   <- Read10X(
   data.dir = paste0(DATA_DIR, '/2019_scRNAseq_data/WT')) %>%
   CreateSeuratObject(project = 'overLIP', min.cells = 1, min.features = 0)
@@ -139,7 +139,7 @@ writePlot(plot1, PATH_FIG)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after quality check
-#saveRDS(data.QC, paste0(PATH_SAVE, '/1_AfterQC.rds'))
+saveRDS(data.QC, paste0(PATH_SAVE, '/1_AfterQC.rds'))
 data.QC <- readRDS(paste0(PATH, '/1_AfterQC.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -170,7 +170,7 @@ data.combined <- ScaleData(data.combined,
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after scaling step
-#saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
+saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
 data.combined <- readRDS(paste0(PATH_SAVE, '/2_Scaled.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
  
@@ -206,7 +206,7 @@ plot4         <- DimPlot(data.combined, group.by = 'orig.ident',
 writePlot(plot4, PATH_FIG)
 
 
-# After Integration Z-Transform  - - - - - - - - - - - - - - - - - - - - - - - -  
+# After CSS Integration Z-Transform  - - - - - - - - - - - - - - - - - - - - - -
 
 data          <- cluster_sim_spectrum(data.combined, label_tag='Experiment', 
                                       cluster_resolution = 0.6, 
@@ -231,13 +231,13 @@ plot6         <- DimPlot(data, group.by = 'orig.ident', reduction = 'umap_cssz',
 writePlot(plot6, PATH_FIG)
 
 # Check cell cycle distribution
-FeaturePlot(data, 'S.Score', reduction = 'umap_cssz') + scale_x_reverse()
-FeaturePlot(data, 'G2M.Score', reduction = 'umap_cssz') + scale_x_reverse()
+FeaturePlot(data, 'S.Score', reduction = 'umap_cssz', order = T) + scale_x_reverse()
+FeaturePlot(data, 'G2M.Score', reduction = 'umap_cssz', order = T) + scale_x_reverse()
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after integration
-#saveRDS(data, paste0(PATH_SAVE, '/3_Integrated.rds'))
+saveRDS(data, paste0(PATH_SAVE, '/3_Integrated.rds'))
 data <- readRDS(paste0(PATH_SAVE, '/3_Integrated.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -288,7 +288,9 @@ markers_genes <- c(
   # Mono/Macrophages
   'Lgals3', 'Lyz2', 
   # ILC2
-  'Il12ra', 'Icos', 'Stab2', 'Bcl11b', 'Tox2'
+  'Il12ra', 'Icos', 'Stab2', 'Bcl11b', 'Tox2',
+  # ILC3 
+  'Rorc'
 )
 
 for(g in markers_genes){
@@ -404,7 +406,7 @@ writePlot(plot11, PATH_FIG)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint of subsets
-#saveRDS(data, paste0(PATH_SAVE, '/4_Filtered.rds'))
+saveRDS(data, paste0(PATH_SAVE, '/4_Filtered.rds'))
 data <- readRDS(paste0(PATH_SAVE, '/4_Filtered.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -435,7 +437,7 @@ plot_density(data, 'DC_score1', pal = 'magma', size = 2)
 markers_genes <- c(
   # Genes of interest
   'Bcl11b', 'Cd74', 'Flt3', 'Tcf7', 'Zbtb16', 'Tox', 'Id2', 'Gata3', 'Batf', 
-  'Zeb2',
+  'Zeb2', 'Rorc',
   # Expressed BZIPs
   'Nfil3', 'Cebpa', 'Batf3', 'Creb3l2',
   # Other BZIPs
@@ -454,6 +456,34 @@ for(g in markers_genes){
   writePlot(feature, paste0(PATH_FIG, '/Markers'), 
             paste0('filtered_', g, '_FeaturePlot.png'))
 }
+
+
+# Custom Visualization - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+gene <- 'Gata3'
+plot_density(data, gene, pal = 'magma', size = 2)
+FeaturePlot(data, gene, order = T, reduction = 'rev_umap_cssz2', pt.size = 2) 
+
+
+## DNASE-SEQ [+][-] GENES ------------------------------------------------------
+dir.create(file.path(paste0(PATH, '/Figures/scRNA-seq/WT/Markers'), '[+][-]'))
+
+transient_genes <- read.table(paste0(PATH, '/Saves/DNase-seq/Peaks/[+][-]/GeneList_[+][-].txt'))[,1]
+transient_genes <- transient_genes[transient_genes %in% rownames(data@assays[["RNA"]]@scale.data)]
+
+for(g in transient_genes){
+  density <- plot_density(data, g, pal = 'magma', size = 2)
+  writePlot(density, paste0(PATH_FIG, '/Markers/[+][-]'), 
+            paste0('filtered_', g, '_DensityPlot.png'))
+  
+  feature <- FeaturePlot(data, g, order = T, reduction = 'rev_umap_cssz2', 
+                         pt.size = 2)
+  writePlot(feature, paste0(PATH_FIG, '/Markers/[+][-]'), 
+            paste0('filtered_', g, '_FeaturePlot.png'))
+}
+
+
+
+
 
 
 
