@@ -23,10 +23,10 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
-DATA_DIR     <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/genes.results'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/SampleSheet_Bulk_RNA_Il7r_a4b7.csv'
-COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/Comparisons_to_make_Il7r_a4b7.csv' 
+PATH         <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
+DATA_DIR     <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/genes.results'
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/SampleSheet_Bulk_RNA_Il7r_a4b7.csv'
+COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Il7r_a4b7/Comparisons_to_make_Il7r_a4b7.csv' 
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -35,7 +35,7 @@ COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Il
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Biobase))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(tximport))
