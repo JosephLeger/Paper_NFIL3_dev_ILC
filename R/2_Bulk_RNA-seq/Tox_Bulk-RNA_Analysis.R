@@ -23,10 +23,10 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
-DATA_DIR     <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Tox/genes.results'
-SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Tox/SampleSheet_Bulk_RNA.csv'
-COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Tox/Comparisons_to_make.csv' 
+PATH         <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
+DATA_DIR     <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Tox/genes.results'
+SAMPLE_SHEET <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Tox/SampleSheet_Bulk_RNA.csv'
+COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Data/Bulk_RNA-seq/Tox/Comparisons_to_make.csv' 
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -35,7 +35,7 @@ COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/To
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Doctorat/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Biobase))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(tximport))
