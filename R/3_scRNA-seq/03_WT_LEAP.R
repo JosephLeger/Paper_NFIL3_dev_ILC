@@ -107,8 +107,8 @@ Annotate    <- Annotate[abs(Annotate$Correlation) > perm_cutoff,]
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save filtered interactions
-#write.table(Annotate, paste0(PATH_SAVE, '/LEAP/results_indexed_filtered.txt'),
-#            row.names = F, col.names = T, quote = F)
+write.table(Annotate, paste0(PATH_SAVE, '/LEAP/results_indexed_filtered.txt'),
+            row.names = F, col.names = T, quote = F)
 Annotate <- read.table(paste0(PATH_SAVE, '/LEAP/results_indexed_filtered.txt'),
                        header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -127,7 +127,7 @@ NF       <- Annotate[Annotate$gene_row %in% 'Nfil3' & Annotate$Lag > 0,]
 # Save table and candidates
 write.table(NF, paste0(PATH_SAVE, '/LEAP/TABLE_Nfil3_Candidates.txt'), 
             quote = F, row.names = F, col.names = T)
-write.table(NF$gene_col, paste0(PATH_SAVE, '/LEAP/Nfil3_Candidates.txt'), 
+write.table(NF$gene_col, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_2.txt'), 
             quote = F, row.names = F, col.names = F)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -141,12 +141,12 @@ Annotate <- read.table(paste0(PATH_SAVE, '/LEAP/results_indexed_filtered.txt'),
                        header = T)
 
 # Generate network for TF known to be involved during ILC development
-Factors <- c('Nfil3', 'Id2', 'Tox', 'Gata3', 'Tcf7', 'Zbtb16', 'Runx3')
+Factors <- c('Nfil3', 'Id2', 'Tox', 'Gata3', 'Tcf7', 'Zbtb16')
 
 Network <- Annotate[Annotate$gene_row %in% Factors & 
                       Annotate$gene_col %in% Factors,]
 Network <- Network[Network$Lag %!in% 0,]
-Network <- Network[Network$Correlation > 0.25,]
+Network <- Network[Network$Correlation > perm_cutoff,]
 
 
 ## iGraph generation for Candidates only and saving to GML file
@@ -172,7 +172,7 @@ writePlot(plot19, PATH_FIG)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Save Network files for GEPHI visualization 
 write_graph(graph, paste0(PATH_SAVE, '/Network.gml'), format='gml')
-write.table(Network, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_2.txt'),
+write.table(Network, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_1.txt'),
             quote = F, row.names = F, col.names = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -181,5 +181,4 @@ write.table(Network, paste0(PATH_SAVE, '/LEAP/Supplementary_Table_2.txt'),
 #      READY FOR DEEPER ANALYSIS OF GENE REGULATORY NETWORK USING GEPHI        #
 ################################################################################
 
-
-                                                                                      
+                                                                        
