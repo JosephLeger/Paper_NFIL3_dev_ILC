@@ -36,7 +36,7 @@ DATA_DIR     <- 'C:/Users/E15639P/Data/scRNA-seq/SingleCell_mm39'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_Functions.R')
+source('C:/Users/E15639P/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyverse))
@@ -105,7 +105,7 @@ writePlot(plot1, PATH_FIG)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after quality check
-#saveRDS(data.QC, paste0(PATH_SAVE, '/1_AfterQC.rds'))
+saveRDS(data.QC, paste0(PATH_SAVE, '/1_AfterQC.rds'))
 data.QC <- readRDS(paste0(PATH, '/1_AfterQC.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -135,7 +135,7 @@ data.combined <- ScaleData(data.combined, vars.to.regress = c('CC.Difference'),
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after scaling step
-#saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
+saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
 data.combined <- readRDS(paste0(PATH_SAVE, '/2_Scaled.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
  
@@ -188,7 +188,7 @@ writePlot(plot5, PATH_FIG)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint of subsets
-#saveRDS(data, paste0(PATH_SAVE, '/3_Filtered.rds'))
+saveRDS(data, paste0(PATH_SAVE, '/3_Filtered.rds'))
 data <- readRDS(paste0(PATH_SAVE, '/3_Filtered.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
