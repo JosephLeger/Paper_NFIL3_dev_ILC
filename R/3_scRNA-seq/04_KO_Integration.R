@@ -21,7 +21,7 @@
 
 
 #===============================================================================
-## SETUP -----------------------------------------------------------------------
+## SET UP ----------------------------------------------------------------------
 #===============================================================================
 
 rm(list=ls(all.names=TRUE))
@@ -30,7 +30,7 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH         <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC'
+PATH         <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
 DATA_DIR     <- 'C:/Users/E15639P/Data/scRNA-seq/SingleCell_mm39'
 
 ################################################################################
@@ -40,7 +40,7 @@ DATA_DIR     <- 'C:/Users/E15639P/Data/scRNA-seq/SingleCell_mm39'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyverse))
@@ -149,7 +149,7 @@ writePlot(plot1, PATH_FIG)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after quality check
 saveRDS(data.QC, paste0(PATH_SAVE, '/1_AfterQC.rds'))
-data.QC <- readRDS(paste0(PATH, '/1_AfterQC.rds'))
+data.QC <- readRDS(paste0(PATH_SAVE, '/1_AfterQC.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
@@ -161,7 +161,6 @@ data.QC <- readRDS(paste0(PATH, '/1_AfterQC.rds'))
 data.combined <- NormalizeData(data.QC, normalization.method = 'LogNormalize')
 
 # Cell Cycle Genes identification and scoring
-suppressPackageStartupMessages(library(Hmisc))
 s.genes       <- capitalize(tolower(cc.genes$s.genes))
 g2m.genes     <- capitalize(tolower(cc.genes$g2m.genes))
 data.combined <- CellCycleScoring(data.combined, s.features = s.genes, 
@@ -180,7 +179,7 @@ data.combined <- ScaleData(data.combined,
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # CheckPoint after scaling step
-#saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
+saveRDS(data.combined, paste0(PATH_SAVE, '/2_Scaled.rds'))
 data.combined <- readRDS(paste0(PATH_SAVE, '/2_Scaled.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
@@ -308,7 +307,7 @@ for(g in markers_genes){
 }
 
 
-## DATA FILTERING : NF ONLY ----------------------------------------------------
+## DATA FILTERING : WT & NF-KO ONLY --------------------------------------------
 
 NF <- subset(data, orig.ident %!in% 'TOX-KO')
 NF <- subset(NF, seurat_clusters %!in% c(17,19,22,23,24))
@@ -374,7 +373,7 @@ NF <- readRDS(paste0(PATH_SAVE, '/4_Filtered_NF.rds'))
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 
-## DATA FILTERING : ALL DATASETS -----------------------------------------------
+## DATA FILTERING : WT & NF-KO & TOX-KO ----------------------------------------
 
 data <- subset(data, seurat_clusters %!in% c(17,19,22,23,24))
 
