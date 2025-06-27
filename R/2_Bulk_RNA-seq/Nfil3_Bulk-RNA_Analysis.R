@@ -36,7 +36,7 @@ COMP_TO_MAKE <- 'C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nf
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Scripts/Custom_functions.R')
+source('C:/Users/E15639P/Doctorat/Bulk_RNA-seq/Custom_Functions.R')
 suppressPackageStartupMessages(library(Biobase))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(tximport))
@@ -77,7 +77,7 @@ Table           <- as.data.frame(TXI$counts)
 colnames(Table) <- METADATA$SampleName
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save aggregated Table_Raw available in GEO
+# Save Table_Raw available in GEO
 write.table(Table, paste0(PATH_SAVE, '/Table_Raw.txt'), quote = F)
 Table <- read.table(paste0(PATH_SAVE, '/Table_Raw.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -151,7 +151,7 @@ eliminate      <- which(apply(cpm(Table), 1, max) < cutoff)
 Table_filtered <- Table[-eliminate,]
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save aggregated Table after non-expressed genes removal
+# Save Table after non-expressed genes removal
 write.table(Table_filtered, paste0(PATH_SAVE, '/Table_Filtered.txt'), quote = F)
 Table_filtered <- read.table(paste0(PATH_SAVE, '/Table_Filtered.txt'), header=T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -215,10 +215,11 @@ dev.print(png, file=paste0(PATH_FIG, '/PCA_plot.png'),
           width=9, height=9, units='in', res=100)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save aggregated Table_Norm available in GEO
+# Save Table_Norm
 write.table(Table_batched, paste0(PATH_SAVE, '/Table_Norm.txt'), quote = F)
 Table_batched <- read.table(paste0(PATH_SAVE, '/Table_Norm.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 
 #===============================================================================
@@ -436,7 +437,7 @@ for(i in 1:(ncol(FULL)-ncol(plus))){
 FULL <- rbind(FULL, plus)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save final table
+# Save final normalized table with stats available in GEO
 write.table(FULL, paste0(PATH_SAVE, '/Table_Results.txt'), quote=F, sep='\t')
 FULL <- read.table(paste0(PATH_SAVE, '/Table_Results.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
