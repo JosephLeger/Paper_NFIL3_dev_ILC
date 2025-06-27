@@ -77,7 +77,7 @@ Table           <- as.data.frame(TXI$counts)
 colnames(Table) <- METADATA$SampleName
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save aggregated Table_Raw available in GEO
+# Save Table_Raw available in GEO
 write.table(Table, paste0(PATH_SAVE, '/Table_Raw.txt'), quote = F)
 Table <- read.table(paste0(PATH_SAVE, '/Table_Raw.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -155,10 +155,11 @@ eliminate      <- which(apply(cpm(Table), 1, max) < cutoff)
 Table_filtered <- Table[-eliminate,]
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save aggregated Table after non-expressed genes removal
+# Save Table after non-expressed genes removal
 write.table(Table_filtered, paste0(PATH_SAVE, '/Table_Filtered.txt'), quote = F)
 Table_filtered <- read.table(paste0(PATH_SAVE, '/Table_Filtered.txt'), header=T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
 
 # Plot distribution before quantile-normalization
 Table_filtered %>% 
@@ -420,7 +421,7 @@ for(i in 1:(ncol(FULL)-ncol(plus))){
 FULL <- rbind(FULL, plus)
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# Save final table
+# Save final normalized table with stats available in GEO
 write.table(FULL, paste0(PATH_SAVE,'/Table_Results.txt'), quote=F, sep='\t')
 FULL <- read.table(paste0(PATH_SAVE,'/Table_Results.txt'), header = T)
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
