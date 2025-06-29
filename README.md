@@ -1,7 +1,7 @@
 # NFIL3_dev_ILC
 ## Description
-This repository contains codes and resources used to perform DNase-seq, Bulk RNA-seq and scRNA-seq post-processing analysis.  
-Information about pre-processing steps are precised in [PRE-PROCESSING.md](https://github.com/JosephLeger/NFIL3_dev_ILC/blob/main/pre-processing/README.md)
+This repository contains codes and resources used to perform DNase-seq, Bulk RNA-seq, scRNA-seq and CUT&RUN post-processing analysis.  
+Information about pre-processing steps are precised in [PRE-PROCESSING.md](https://github.com/JosephLeger/NFIL3_dev_ILC/blob/main/pre-processing/README.md).  
 
 Complete explanation is avaible ([https://github.com/JosephLeger/NFIL3_dev_ILC/Full_Tutorial/](https://www.youtube.com/watch?v=dQw4w9WgXcQ)).
 
