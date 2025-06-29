@@ -5,8 +5,6 @@
 #===============================================================================
 
 
-
-
 #===============================================================================
 ## SET UP ----------------------------------------------------------------------
 #===============================================================================
@@ -16,7 +14,7 @@ rm(list=ls(all.names=TRUE))
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PROJECT INFO ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 ################################################################################
 
-PATH <- 'C:/Users/E15639P/Desktop/Review'
+PATH <- 'C:/Users/E15639P/Desktop/NFIL3_dev_ILC'
 
 ################################################################################
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
@@ -25,7 +23,7 @@ PATH <- 'C:/Users/E15639P/Desktop/Review'
 setwd(PATH)
 
 # Load Packages and custom functions
-source('C:/Users/E15639P/Doctorat/Custom_Functions.R')
+source('C:/Users/E15639P/Desktop/NFIL3_dev_ILC/Custom_Functions.R')
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(slingshot))
@@ -95,17 +93,23 @@ Regions_PieChart <- function(x){
 #===============================================================================
 
 # Bulk RNA-seq NFIL3 table (GSE291075_Table_Norm_Stats_Batch1-2.txt)
-NF_Table   <- read.table('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Saves/Bulk_RNA-seq/Nfil3/Table_Results.txt')
-NF_META    <- read.table('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Nfil3/SampleSheet_Bulk_RNA.csv', sep = ',', header = T)
+NF_Table   <- read.table(paste0(
+  PATH,'/Saves/Bulk_RNA-seq/Nfil3/Table_Results.txt'))
+NF_META    <- read.table(paste0(
+  PATH,'/Data/Bulk_RNA-seq/Nfil3/SampleSheet_Bulk_RNA.csv'), 
+                         sep = ',', header = T)
 colnames(NF_META)[3] <- 'Group'
 
 # Bulk RNA-seq TOX table (GSE291316_Table_Norm_Stats_Batch4.txt)
-TOX_Table  <- read.table('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Saves/Bulk_RNA-seq/Tox/Table_Results.txt')
-TOX_META   <- read.table('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Data/Bulk_RNA-seq/Tox/SampleSheet_Bulk_RNA.csv', sep = ',', header = T)
+TOX_Table  <- read.table(paste0(
+  PATH,'/Saves/Bulk_RNA-seq/Tox/Table_Results.txt'))
+TOX_META   <- read.table(paste0(
+  PATH,'/Data/Bulk_RNA-seq/Tox/SampleSheet_Bulk_RNA.csv'), 
+                         sep = ',', header = T)
 colnames(TOX_META)[3] <- 'Group'
 
 # scRNA-seq saved object for all datasets
-scRNAseq   <- readRDS('C:/Users/E15639P/Desktop/GitHub_NF_dev_ILC/Saves/scRNA-seq/KO/5_Pseudotime_ALL.rds')
+scRNAseq   <- readRDS(paste0(PATH,'/Saves/scRNA-seq/KO/5_Pseudotime_ALL.rds'))
 
 
 # scRNA-seq LEAP Candidates (Available in GitHub)
@@ -135,7 +139,6 @@ colnames(HA_Annotated)[1] <- 'Peak_ID'
 # Manually re-annotated peaks (Available in GitHub)
 peaks_manual <- read.table(paste0(
   PATH,'/Data/CUT&RUN/HOMER/Peak_Manual_Annotation.csv'), sep = ',', header = T)
-
 
 
 
@@ -242,7 +245,6 @@ for(i in 1:length(stat_list)){
   }
 }
 TOX_KO_sig
-
 
 
 ## VALIDATION IN TOX INDUCED RNA-SEQ -------------------------------------------
@@ -397,8 +399,4 @@ for(i in 1:3){
   
   print(p)
 }
-
-
-
-
 
