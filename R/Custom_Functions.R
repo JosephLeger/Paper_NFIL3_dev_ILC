@@ -293,7 +293,6 @@ DrawDotplot <- function(counts, sampleSheet, gene,
     plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
       geom_point(size = 5)
   }
-    
   plot <- plot + 
     stat_summary(fun.data=mean_sdl, fun.args=list(mult=1), geom='errorbar', 
                  color='black', width=0.1, linewidth=0.5) +
