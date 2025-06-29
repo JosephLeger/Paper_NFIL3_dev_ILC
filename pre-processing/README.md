@@ -4,7 +4,6 @@
 Before applying provided R scripts, Bulk RNA-seq, DNase-seq and CUT&RUN data were pre-processed using custom pipelines [**Workflow_RNA-seq**](https://github.com/JosephLeger/Workflow_RNA-seq) ([v1.0.0](https://github.com/JosephLeger/Workflow_RNA-seq/releases/tag/v1.0.0)) and [**Workflow_ChIP-like**](https://github.com/JosephLeger/Workflow_ChIP-like) ([v1.0.0](https://github.com/JosephLeger/Workflow_ChIP-like/releases)). Single cell RNA-seq data were pre-processed using **CellRanger**.
 To reproduce the same pre-processing steps, we provided here the exact command lines used for these respective custom pipelines, or the equivalent command line syntax while using directly tools.  
 Mapping and annotation were realized using Ensembl [GRCm39](https://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/dna/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa.gz) and [GTF release 108](https://ftp.ensembl.org/pub/release-108/gtf/mus_musculus/Mus_musculus.GRCm39.108.gtf.gz).   
-Adapters used by Trimmomatic for trimming are available in [Trimmomatic](https://github.com/JosephLeger/NFIL3_dev_ILC/tree/main/pre-processing/Trimmomatic) folder.   
 
 ## SINGLE CELL RNA-SEQ
 ### Requirements
