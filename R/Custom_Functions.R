@@ -127,7 +127,7 @@ DrawHeatmap <- function(counts, sampleSheet, genes,
   
   # Subset table - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
   # Subset sampleSheet based on defined or default groups
-  if(length(groups) == 1 & is.na(groups)){
+  if(length(groups) == 1 && is.na(groups)){
     groups        <- unique(sampleSheet$Group)
   }
   sampleSheet     <- sampleSheet[sampleSheet$Group %in% groups,]
@@ -182,8 +182,127 @@ DrawHeatmap <- function(counts, sampleSheet, genes,
                    main = title)
 }
 
+#-------------------------------------------------------------------------------
+
+DrawDotplot <- function(counts, sampleSheet, gene, 
+                        groups=NA, 
+                        repeated=NA,
+                        colstat=NA,
+                        show.fc = TRUE,
+                        main = gene){
+  
+  # Draw dotplot figure for a single gene using ggplot2
+  #
+  # counts      = Worked_Table with gene expressions and names as Symbol column
+  # sampleSheet = metadata
+  # gene        = gene name to draw
+  # groups      = groups to consider from sampleSheet$Group column
+  # repeated    = whether samples are linked and add a line for sample evolution
+  # colstat     = define stat column from sampleSheet to use for plot title *
+  # show.fc     = whether color the line for sample evolution
+  # main        = Plot title
+  
+  suppressPackageStartupMessages(library(ggplot2))
+  
+  
+  # Abort function if 'Group' column not found in sampleSheet
+  if('Group' %!in% colnames(sampleSheet)){
+    stop(paste0('Provided sampleSheet does not contain \'Group\' column. ',
+                'Please rename the column to consider to group samples.'))
+  }
+  
+  # Subset counts based on expressed genes and groups - - - - - - - - - - - - -
+  if(length(groups) == 1 && is.na(groups)){
+    groups    <- unique(sampleSheet$Group)
+  }
+  sampleSheet <- sampleSheet[sampleSheet$Group %in% groups,]
+  
+  # Extract information about provided gene
+  geneline <- counts[counts$Symbol %in% gene, sampleSheet$Sample]
+  
+  if(nrow(geneline) > 1){
+    warning(paste0('Multiple rows found for ', gene, '. Only first line will be considered.'))
+  }else if(nrow(geneline) == 0){
+    stop(paste(gene, 'gene not found.'))
+  }
+  
+  # Organize matrix for ggplot2 with gene expression and corresponding group
+  mat    <- data.frame(t(geneline))
+  g_id   <- c()
+  l_id   <- c()
+  for(r in rownames(mat)){
+    g_id <- c(g_id, sampleSheet$Group[sampleSheet$Sample %in% r])
+    
+    # Optionally add repeated parameter
+    if(!is.na(repeated)){
+      l_id <- c(l_id, sampleSheet[,repeated][sampleSheet$Sample %in% r])
+    }else{
+      l_id <- c(1:nrow(mat))
+    }
+  }
+  mat           <- cbind(mat, g_id, l_id)
+  colnames(mat) <- c('Expression', 'Group', 'Repeat')
+  
+  # Calculate FC by sample if needed
+  if(!is.na(repeated) && show.fc){
+    mat$log2FC <- rep(NA, nrow(mat))
+    for(s in sampleSheet$Sample[sampleSheet$Group %in% groups[1]]){
+      repnum <- sampleSheet[,repeated][sampleSheet$Sample %in% s]
+      s2     <- sampleSheet$Sample[sampleSheet$Group %in% groups[2] &
+                                     sampleSheet[,repeated] %in% repnum]
+      mat[s,'log2FC']  <- log2(mat[s2,1]/mat[s,1])
+      mat[s2,'log2FC'] <- log2(mat[s2,1]/mat[s,1])
+    }
+  }else{
+    mat$log2FC <- runif(nrow(mat),0,1)
+  }
+  
+  # Define plot title adding or not statistical relevance
+  if(!is.na(colstat)){
+    stat <- counts[,colstat][counts$Symbol %in% gene]
+    if(as.numeric(stat) < 0.001){
+      title <- paste(main, '****')
+    }else if(as.numeric(stat) < 0.005){
+      title <- paste(main, '***')
+    }else if(as.numeric(stat) < 0.01){
+      title <- paste(main, '**')
+    }else if(as.numeric(stat) < 0.05){
+      title <- paste(main, '*')
+    }else{
+      title <- main
+    }
+  }else{
+    title <- main
+  }
+  
+  # Draw plot depending on selected options
+  if(!is.na(repeated) && show.fc){
+    plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
+      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, show.legend = TRUE) +
+      scale_color_gradient2(low='blue', mid = 'beige', high='red') +
+      geom_point(size = 5)
+  }else if(!is.na(repeated)){
+    plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
+      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, show.legend = FALSE) +
+      scale_color_gradient(low='grey', high='grey') +
+      geom_point(size = 5)
+    print('choice2')
+  }else{
+    plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
+      geom_point(size = 5)
+  }
+  
+  plot <- plot + 
+    stat_summary(fun.data=mean_sdl, fun.args=list(mult=1), geom='errorbar', color='black', width=0.1, linewidth=0.5) +
+    stat_summary(fun='mean', geom='point', color='black', group=1, shape=3, size=10) +
+    theme_classic() +
+    ggtitle(title)
+  
+  return(plot)
+}
 
 
+  
 #===============================================================================
 # LEAP -------------------------------------------------------------------------
 #===============================================================================
