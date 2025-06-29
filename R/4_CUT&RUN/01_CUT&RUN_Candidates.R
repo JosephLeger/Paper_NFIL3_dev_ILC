@@ -30,7 +30,6 @@ suppressPackageStartupMessages(library(slingshot))
 suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(VennDiagram))
 
-
 # Create required directories
 dir.create(file.path(paste0(PATH, '/Figures'), 'CUT&RUN'))
 dir.create(file.path(paste0(PATH, '/Figures/CUT&RUN'), 'Curves'))
