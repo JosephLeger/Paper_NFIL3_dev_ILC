@@ -220,7 +220,8 @@ DrawDotplot <- function(counts, sampleSheet, gene,
   geneline <- counts[counts$Symbol %in% gene, sampleSheet$Sample]
   
   if(nrow(geneline) > 1){
-    warning(paste0('Multiple rows found for ', gene, '. Only first line will be considered.'))
+    warning(paste0('Multiple rows found for ', gene, 
+                   '. Only first line will be considered.'))
   }else if(nrow(geneline) == 0){
     stop(paste(gene, 'gene not found.'))
   }
@@ -277,12 +278,14 @@ DrawDotplot <- function(counts, sampleSheet, gene,
   # Draw plot depending on selected options
   if(!is.na(repeated) && show.fc){
     plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
-      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, show.legend = TRUE) +
+      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, 
+                show.legend = TRUE) +
       scale_color_gradient2(low='blue', mid = 'beige', high='red') +
       geom_point(size = 5)
   }else if(!is.na(repeated)){
     plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
-      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, show.legend = FALSE) +
+      geom_line(aes(group=Repeat, color=log2FC), alpha=1, linewidth=1.2, 
+                show.legend = FALSE) +
       scale_color_gradient(low='grey', high='grey') +
       geom_point(size = 5)
     print('choice2')
@@ -290,10 +293,12 @@ DrawDotplot <- function(counts, sampleSheet, gene,
     plot <- ggplot(mat, aes(x=factor(Group, levels=groups), y=Expression)) +
       geom_point(size = 5)
   }
-  
+    
   plot <- plot + 
-    stat_summary(fun.data=mean_sdl, fun.args=list(mult=1), geom='errorbar', color='black', width=0.1, linewidth=0.5) +
-    stat_summary(fun='mean', geom='point', color='black', group=1, shape=3, size=10) +
+    stat_summary(fun.data=mean_sdl, fun.args=list(mult=1), geom='errorbar', 
+                 color='black', width=0.1, linewidth=0.5) +
+    stat_summary(fun='mean', geom='point', color='black', group=1, shape=3, 
+                 size=10) +
     theme_classic() +
     ggtitle(title)
   
