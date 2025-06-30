@@ -11,6 +11,7 @@
 # Analyse samples distribution inside trajectories
 # Draw gene expression variations across pseudotime
 # Perform K-means clustering on all TF expression variations
+# Save RDS file used as input for the next step
 
 
 
