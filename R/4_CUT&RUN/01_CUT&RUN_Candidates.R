@@ -3,6 +3,16 @@
 #===============================================================================
 ## DESCRIPTION -----------------------------------------------------------------
 #===============================================================================
+# Script used to identify NFIL3 candidate targets using CUT&RUN data
+#
+# Load result files from all previous steps (DNase-seq, Bulk RNA-seq, scRNA-seq)
+# Compare in vitro and ex vivo results to highlight NFIL3 regulated candidates 
+# Explore the role of TOX out of these candidates by analyzing misregulations
+# Refine NFIL3 candidate list based on physical binding obtained by CUT&RUN
+#
+# Data are available in GEO as accession number GSE291321
+# Other files are available in https://github.com/JosephLeger/NFIL3_dev_ILC/data
+
 
 
 #===============================================================================
