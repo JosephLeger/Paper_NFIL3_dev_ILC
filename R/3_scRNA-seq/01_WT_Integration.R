@@ -17,6 +17,8 @@
 # Quantify and remove outliers based on this identification
 # Visualize key genes expression
 # Save RDS file used as input for the next step
+#
+# Data are available in GEO as accession number GSE291317
 
 
 
