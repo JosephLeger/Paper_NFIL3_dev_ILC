@@ -25,7 +25,7 @@ ColorBlind <- c(Blues, Others, YReds, Greys)
 
 
 #===============================================================================
-# PLOTS ------------------------------------------------------------------------
+# FILE WRITING -----------------------------------------------------------------
 #===============================================================================
 
 writePlot <- function(plot, path, filename=F, width=9, height=9, res=100){
@@ -102,19 +102,19 @@ DrawHeatmap <- function(counts, sampleSheet, genes,
   # by.group       = whether draw heatmap for average expression by Group
   # groups         = groups to consider from sampleSheet$Group column
   # logT           = whether log transform expression values
-  # scale          = 
-  # cluster_cols   =
-  # cluster_rows   =
-  # treeheight_row = 
-  # treeheight_col = 
-  # color          =
-  # border_color   =
-  # gaps_col       = 
-  # gaps_row       = 
-  # fontsize       =
-  # fontsize_row   =
-  # fontsize_col   =
-  # title          =
+  # scale          = see pheatmap parameters
+  # cluster_cols   = see pheatmap parameters
+  # cluster_rows   = see pheatmap parameters
+  # treeheight_row = see pheatmap parameters
+  # treeheight_col = see pheatmap parameters
+  # color          = see pheatmap parameters
+  # border_color   = see pheatmap parameters
+  # gaps_col       = see pheatmap parameters
+  # gaps_row       = see pheatmap parameters
+  # fontsize       = see pheatmap parameters
+  # fontsize_row   = see pheatmap parameters
+  # fontsize_col   = see pheatmap parameters
+  # title          = main title of the generated plot
   
   suppressPackageStartupMessages(library(pheatmap))
   
@@ -202,7 +202,6 @@ DrawDotplot <- function(counts, sampleSheet, gene,
   # main        = Plot title
   
   suppressPackageStartupMessages(library(ggplot2))
-  
   
   # Abort function if 'Group' column not found in sampleSheet
   if('Group' %!in% colnames(sampleSheet)){
