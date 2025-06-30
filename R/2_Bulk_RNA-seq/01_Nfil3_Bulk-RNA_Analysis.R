@@ -11,6 +11,9 @@
 # Remove batch effect using CombatSeq
 # Annotate gene symbols using org.Mm.eg.db package
 # Perform statistical DEG analysis using Limma
+#
+# Data are available in GEO as accession number GSE291075
+# Other files are available in https://github.com/JosephLeger/NFIL3_dev_ILC/data
 
 
 
