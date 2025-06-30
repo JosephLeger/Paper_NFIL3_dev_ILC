@@ -1,11 +1,9 @@
 # NFIL3_dev_ILC
-**The transcription factor NFIL3 drives ILC specification from lymphoid progenitors**  
-
-Joseph Léger, Eva Artano, Delphine Coulais, Naomie Belletoise, Raoudha Fadhloun, Devin Kenney, Avinash Bhandoola, Christelle Harly  
 
 ## Description
-This repostory contains codes and resources used in the paper [**The transcription factor NFIL3 drives ILC specification from lymphoid progenitors**]()  
-
+This repostory contains codes and resources used in the paper :  
+[**The transcription factor NFIL3 drives ILC specification from lymphoid progenitors**]()   
+Joseph Léger, Eva Artano, Delphine Coulais, Naomie Belletoise, Raoudha Fadhloun, Devin Kenney, Avinash Bhandoola, Christelle Harly  
 
 
 to perform scRNA-seq, Bulk RNA-seq, DNase-seq and CUT&RUN post-processing analyzes from 
