@@ -13,6 +13,8 @@
 # Apply cell cycle genes regression during scaling
 # Perform clustering and identify cell types using ImmGen.org
 # Remove outliers based on this identification
+#
+# Data are available in GEO as accession number GSE291317
 
 
 
