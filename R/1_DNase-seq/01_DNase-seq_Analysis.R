@@ -8,6 +8,9 @@
 # Apply DiffBind to identify differentially opened chromatin regions
 # Set up subgroups of peaks based on their accessibility pattern
 # Define TF subfamilies of interest based on HOMER annotation results
+#
+# Data are available in GEO as accession number GSE291319
+# Other files are available in https://github.com/JosephLeger/NFIL3_dev_ILC/data
 
 
 
