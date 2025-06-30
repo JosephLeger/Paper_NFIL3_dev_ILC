@@ -1,4 +1,8 @@
 # NFIL3_dev_ILC
+**The transcription factor NFIL3 drives ILC specification from lymphoid progenitors**  
+
+Joseph Léger, Eva Artano, Delphine Coulais, Naomie Belletoise, Raoudha Fadhloun, Devin Kenney, Avinash Bhandoola, Christelle Harly  
+
 ## Description
 This repository contains codes and resources used to perform DNase-seq, Bulk RNA-seq, scRNA-seq and CUT&RUN post-processing analysis.  
 Information about pre-processing steps are precised in [PRE-PROCESSING.md](https://github.com/JosephLeger/NFIL3_dev_ILC/blob/main/pre-processing/README.md).  
