@@ -1,4 +1,4 @@
-# NFIL3_dev_ILC
+# Paper_NFIL3_dev_ILC
 Source code used in the paper : [The transcription factor NFIL3 drives ILC specification from lymphoid progenitors]()   
 Léger J, Artano E, Coulais D, Belletoise N, Fadhloun R, Kenney D, Bhandoola A, Harly C.  
   
