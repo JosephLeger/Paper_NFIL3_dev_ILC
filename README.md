@@ -1,6 +1,6 @@
 # NFIL3_dev_ILC
 Source code used in the paper : [The transcription factor NFIL3 drives ILC specification from lymphoid progenitors]()   
-J. Léger, E. Artano, D. Coulais, N. Belletoise, R. Fadhloun, D. Kenney, A. Bhandoola, C. Harly  
+Léger J, Artano E, Coulais D, Belletoise N, Fadhloun R, Kenney D, Bhandoola A, Harly C.  
   
 ## Description 
 This repository contains scripts and resources used to perform DNase-seq, Bulk RNA-seq, scRNA-seq and CUT&RUN post-processing analyzes.  
