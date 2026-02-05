@@ -83,8 +83,8 @@ sh mergeBAM.sh -N _Clum_Trimmed_sorted_filtered -R true Mapped/mm39/BAM SRA_list
 sh BAM2BW.sh -N _merged -F bigwig -R true Mapped/mm39/BAM
 
 # Peak calling with MACS2
-sh 5_PeakyFinders.sh -U 'MACS2' -N _merged Mapped/mm39/BAM
-sh 5_PeakyFinders.sh -U 'MACS2' -N _Clum_Trimmed_sorted_filtered Mapped/mm39/BAM
+sh 5_PeakyFinders.sh -U 'MACS2' -N _merged Mapped/mm39/BAM ../Ref/Genome/mm39.chrom.sizes
+sh 5_PeakyFinders.sh -U 'MACS2' -N _Clum_Trimmed_sorted_filtered Mapped/mm39/BAM ../Ref/Genome/mm39.chrom.sizes
 
 # Motif enrichment analysis and peak annotation with HOMER from patterns identified by R DiffBind using filtered GTF from scRNA-seq analysis
 sh 6_Annotate.sh -N '' -R 200 -L '8,10,12' -A true -M true NFIL3_dev_ILC/Peaks ../Ref/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa ../Ref/refdata-cellranger-mm39/Mus_musculus.GRCm39.108.filtered.gtf
